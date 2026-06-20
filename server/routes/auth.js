@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const { UserModel } = require("../models/user")
 const { z } = require("zod")
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const User_Auth = require("../middleware/user_auth");
 const JWT_SECRET = process.env.JWT_SECRET;
 const userroutes = express.Router()
 
@@ -18,8 +19,8 @@ userroutes.post("/auth/signup", async function (req, res) {
             .string()
             .min(5, { message: "first name must contain atleast 5 charcter" }),
         email: z
-        .string()
-        .email(),
+            .string()
+            .email(),
         password: z.
             string({ required_error: "Password is required" })
             .min(8, { message: "Password must be at least 8 characters long" })
@@ -30,6 +31,12 @@ userroutes.post("/auth/signup", async function (req, res) {
     })
     //parsed zod
     const parsezoduser = userzod.safeParse(req.body);
+
+    if (!parsezoduser.success) {
+        return res.status(400).json({
+            message: parsezoduser.error.issues[0].message
+        });
+    }
 
     const { username, email, password } = req.body
     //checking user already exist or not
@@ -42,14 +49,12 @@ userroutes.post("/auth/signup", async function (req, res) {
     }
     //bcrypt the password
     const hashedpassword = await bcrypt.hash(password, 9)
-
     try {
-        const usersingnup = await UserModel.create({
+        await UserModel.create({
             username: username,
             email: email,
             password: hashedpassword
         })
-
         res.json({
             message: "sign-up succesfully"
         })
@@ -58,6 +63,8 @@ userroutes.post("/auth/signup", async function (req, res) {
             message: "something went wrong"
         })
     }
+
+
 })
 
 
@@ -65,32 +72,44 @@ userroutes.post("/auth/login", async function (req, res) {
     const { username, email, password } = req.body
 
     const userlogin = await UserModel.findOne({
-        email: email,
+        email: email
     })
 
     if (!userlogin) {
-        res.status(401).json({
-            message: "user already exist"
+        return res.status(404).json({
+            message: "user not  exist"
         })
     }
 
     const comparepassword = await bcrypt.compare(password, userlogin.password,)
 
-    if (comparepassword) {
+    if (!comparepassword) {
         return res.json({
             message: "invalid password!"
         })
     }
+    try {
+        const token = jwt.sign(
+            { id: userlogin._id },
+            JWT_SECRET,
+            { expiresIn: "7d" }
+        )
 
-    const token = jwt.sign({
-        id: userlogin._id
-    }, JWT_SECRET)
 
+        res.json({
+            token,
+            message: "login successfully!!"
+        })
+    } catch (e) {
+        res.status(500).json({ message: "something went wrong" })
+    }
 
+})
+
+userroutes.get("/myname", User_Auth, function (req, res) {
     res.json({
-        message: "login successfully!!"
+        name: "shravan choudhary"
     })
-
 })
 
 
