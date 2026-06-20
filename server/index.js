@@ -6,9 +6,10 @@ app.use(express.json())
 
 
 const userroutes=require("./routes/auth");
-
+const Profileroute=require("./routes/profile");
 
 app.use("/api",userroutes)
+app.use("/api/profile",Profileroute)
 
 
 

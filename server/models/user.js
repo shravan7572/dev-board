@@ -10,6 +10,7 @@ const UserSchema = new Schema({
     photo: { type: String},
     github: { type: String},
     linkedin: { type: String},
+    twitter: { type: String},
     theme  : { type: String , default:"purple"},
 });
 
