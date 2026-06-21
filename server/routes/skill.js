@@ -57,6 +57,41 @@ SkillRoute.get("/skill/:username", async function (req, res) {
 
 })
 
+SkillRoute.delete("/skill/:id",User_Auth,async function (req,res){
+        
+    try{
+    const id=req.params.id;
+
+        const getskillsbyid=await SkillModel.findById(req.params.id)
+
+        if(!getskillsbyid){
+             return res.status(404).json({
+                message:"skill Not found"
+            })
+        }
+
+        if(getskillsbyid.userid!==req.userid){
+            return res.status(403).json({
+                message:"not auhtorized"
+            })
+        }
+
+        await SkillModel.findByIdAndDelete(req.params.id);
+
+        res.json({
+            message:"Skill deleted Successfully!!"
+        })
+
+    }catch(e){
+        res.status(500).json({
+            message:"something went wrong"
+        })
+    }
+
+
+    
+})
+
 
 
 module.exports = SkillRoute;
