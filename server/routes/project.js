@@ -57,13 +57,13 @@ try {
 
 })
 
-ProjectRoute.put("/project/:id",User_Auth,async function (req,res){
+ProjectRoute.put("/project/update/:id",User_Auth,async function (req,res){
 
  const { title, description, techstack, liveurl, githuburl, thumbnail, featured } = req.body;
 
     const id=req.params.id;
     try {
-        const checkid=await ProjectModel.findOne(req.params.id);
+        const checkid=await ProjectModel.findById(req.params.id);
 
         if(!checkid){
             return res.status(404).json({
@@ -72,16 +72,16 @@ ProjectRoute.put("/project/:id",User_Auth,async function (req,res){
         }
 
         if(checkid.userid!==req.userid){
-            res.status(403).json({
+          return  res.status(403).json({
                 message:"not auhtenticatied"
             })
         }
 
       const updatedprojectdetail= await ProjectModel.findByIdAndUpdate(
-            req.userid,
+           req.params.id,
             req.body,
             {new :true}
-        ).select("-password");
+        )
 
         res.json({
             updatedprojectdetail
@@ -89,13 +89,49 @@ ProjectRoute.put("/project/:id",User_Auth,async function (req,res){
 
 
     } catch (e) {
-        req.status(500).json({
+        res.status(500).json({
             message:e.message
         })
         
     }
     
 })
+
+ProjectRoute.delete("/project/:id",User_Auth,async function (req,res){
+
+    const id=req.params.id;
+    try {
+        const checkid=await ProjectModel.findById(req.params.id);
+
+        if(!checkid){
+            return res.status(404).json({
+                message:"Project not Found"
+            })
+        }
+
+        if(checkid.userid!==req.userid){
+          return  res.status(403).json({
+                message:"not auhtenticatied"
+            })
+        }
+
+      const updatedprojectdetail= await ProjectModel.findByIdAndDelete(req.params.id)
+
+        res.json({
+            message:"project Deleted Successfully!!!"
+        })
+
+
+    } catch (e) {
+        res.status(500).json({
+            message:e.message
+        })
+        
+    }
+    
+})
+
+
 
 
 
