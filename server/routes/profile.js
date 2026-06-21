@@ -38,14 +38,14 @@ Profileroute.put("/", User_Auth, async (req, res) => {
     try {
       const userprofile=await UserModel.findByIdAndUpdate(
             req.userid,
-            req.body,      // updates with whatever they send
-            { new: true }  // returns updated document
+            req.body,      
+            { new: true }  
         ).select("-password")
 
         res.json({userprofile})
 
     } catch (e) {
-        res.json({
+        res.status(500).json({
             message:"unable to uppdate"
         })
 
@@ -57,4 +57,4 @@ Profileroute.put("/", User_Auth, async (req, res) => {
 
 
 
-module.exports = Profileroute
+module.exports = Profileroute 
