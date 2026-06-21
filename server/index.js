@@ -8,10 +8,12 @@ app.use(express.json())
 const userroutes=require("./routes/auth");
 const Profileroute=require("./routes/profile");
 const SkillRoute=require("./routes/skill")
+const ProjectRoute=require("./routes/project");
 
 app.use("/api",userroutes)
 app.use("/api/profile",Profileroute)
 app.use("/api",SkillRoute)
+app.use("/api",ProjectRoute)
 
 
 

@@ -16,8 +16,6 @@ Profileroute.get("/:username", async (req, res) => {
                 message: "User not found"
             })
         }
-
-
         res.json({
             checktheusername
         })
@@ -36,17 +34,17 @@ Profileroute.put("/", User_Auth, async (req, res) => {
     const { name, bio, photo, github, linkedin, twitter } = req.body;
 
     try {
-      const userprofile=await UserModel.findByIdAndUpdate(
+        const userprofile = await UserModel.findByIdAndUpdate(
             req.userid,
-            req.body,      
-            { new: true }  
+            req.body,
+            { new: true }
         ).select("-password")
 
-        res.json({userprofile})
+        res.json({ userprofile })
 
     } catch (e) {
         res.status(500).json({
-            message:"unable to uppdate"
+            message: "unable to uppdate"
         })
 
     }
