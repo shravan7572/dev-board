@@ -9,11 +9,13 @@ const userroutes=require("./routes/auth");
 const Profileroute=require("./routes/profile");
 const SkillRoute=require("./routes/skill")
 const ProjectRoute=require("./routes/project");
+const ReactionRoute=require("./routes/reaction");
 
 app.use("/api",userroutes)
 app.use("/api/profile",Profileroute)
 app.use("/api",SkillRoute)
 app.use("/api",ProjectRoute)
+app.use("/api/reaction",ReactionRoute)
 
 
 
