@@ -26,7 +26,7 @@ ReactionRoute.get("/:username", async function (req, res) {
             })
         }
 
-        const counts = await getCounts(user._id);
+        const counts = await getCounts(user._id.toString());
         res.json({ counts })
     }
     catch (e) {
@@ -47,13 +47,10 @@ ReactionRoute.post("/:username", async function (req, res) {
             })
         }
 
-        const profileID =user._id.toString()
+        const profileID = user._id.toString()
         const visitorID = req.ip;
         const { type } = req.body;
 
-        console.log("visitorId:", req.ip)
-console.log("type:", req.body.type)
-console.log("user:", user)
 
         if (!["fire", "heart", "clap"].includes(type)) {
             return res.status(400).json({ message: "Invalid reaction type" })
