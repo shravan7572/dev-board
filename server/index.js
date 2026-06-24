@@ -11,6 +11,7 @@ const SkillRoute=require("./routes/skill")
 const ProjectRoute=require("./routes/project");
 const ReactionRoute=require("./routes/reaction");
 const Profileviewroute=require("./routes/profileview");
+const ContactRoute=require("./routes/contact")
 
 app.use("/api",userroutes)
 app.use("/api/profile",Profileroute)
@@ -18,6 +19,7 @@ app.use("/api",SkillRoute)
 app.use("/api",ProjectRoute)
 app.use("/api/reaction",ReactionRoute)
 app.use("/api/view",Profileviewroute)
+app.use("/api/contact",ContactRoute)
 
 
 
