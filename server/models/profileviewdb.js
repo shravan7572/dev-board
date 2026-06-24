@@ -3,9 +3,9 @@ const Schema=mongoose.Schema;
 
 const viewdata=new Schema({
     profileId:{type:String,required:true},
-    browser:{type:String,default:"unknown"},
-    device:{type:String,default:"desktop"},
-    os:{type:String,default:"unknown"},
+    browser:{type:String},
+    device:{type:String},
+    os:{type:String},
     viewAt:{type:Date,default:Date.now},
 
 })
