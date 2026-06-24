@@ -50,7 +50,7 @@ console.log("Message ID:", info.messageId);
             to: email,
             subject: `Thanks for contacting ${username}`,
             html: `
-        <h2>Message received ✅</h2>
+        <h2>Message received !!</h2>
         <p>Hi ${name},</p>
         <p>${username} has received your message and will reply soon.</p>
         <br/>
