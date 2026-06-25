@@ -27,7 +27,7 @@ ContactRoute.post("/:username", async function (req, res) {
 
     const info=    await transporter.sendMail({
             from: process.env.EMAIL_USER,
-            to: process.env.HARD_CODED_EMAIL,
+            to:user.email,
             subject: `New message from ${name}!`,
             html: `
             <h2>New Contact Message</h2>
@@ -41,9 +41,6 @@ ContactRoute.post("/:username", async function (req, res) {
             <p>${message}</p>
           `
         })
-   console.log("Email sent successfully!");
-console.log("Message ID:", info.messageId);
-    
 
         await transporter.sendMail({
             from: process.env.EMAIL_USER,

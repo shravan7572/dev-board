@@ -1,8 +1,28 @@
 const express = require("express");
 const { UserModel } = require("../models/user");
 const User_Auth = require("../middleware/User_Auth");
+const { upload, cloudinary } = require("../utils/cloudinary");
 
 const Profileroute = express.Router();
+
+Profileroute.post("/upload-avatar", User_Auth, upload.single("avatar"), async function (req, res) {
+    try {
+        const image_url = req.file.path
+        const imageupload = await UserModel.findByIdAndUpdate(req.userid, {
+            photo: image_url
+        })
+
+        res.json({
+            message: "photo uploaded successfully!!",
+        })
+
+    } catch (e) {
+        res.status(500).json({
+            message: e.message
+        })
+    }
+})
+
 
 Profileroute.get("/:username", async (req, res) => {
 
@@ -25,9 +45,7 @@ Profileroute.get("/:username", async (req, res) => {
             message: "something went wrong"
         })
     }
-
 })
-
 
 Profileroute.put("/", User_Auth, async (req, res) => {
 
@@ -50,8 +68,6 @@ Profileroute.put("/", User_Auth, async (req, res) => {
     }
 
 })
-
-
 
 
 

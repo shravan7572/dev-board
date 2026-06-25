@@ -5,21 +5,25 @@ const GithubRoute = express.Router();
 GithubRoute.get("/:githubUsername", async function (req, res) {
     try {
         const githubUsername = req.params.githubUsername;
-        
-        const response = await axios.get(`https://api.github.com/users/${githubUsername}`, {
-            headers: {
-                "User-Agent": "DevBoard-App"
-            }
-        })
 
-        const {
-            name,
-            avatar_url,
-            bio,
-            public_repos,
-            followers,
-            following
-        } = response.data;
+        const [userResponse, reposResponse] = await Promise.all([
+            axios.get(`https://api.github.com/users/${githubUsername}`, {
+                headers: { "User-Agent": "DevBoard-App" }
+            }),
+            axios.get(`https://api.github.com/users/${githubUsername}/repos?sort=stars&per_page=6`, {
+                headers: { "User-Agent": "DevBoard-App" }
+            })
+        ])
+
+        const { name, avatar_url, bio, public_repos, followers, following } = userResponse.data
+
+        const repos = reposResponse.data.map(repo => ({
+            name: repo.name,
+            description: repo.description,
+            stars: repo.stargazers_count,
+            language: repo.language,
+            url: repo.html_url
+        }))
 
         return res.status(200).json({
             name,
@@ -27,7 +31,7 @@ GithubRoute.get("/:githubUsername", async function (req, res) {
             bio,
             public_repos,
             followers,
-            following
+            following, repos
         });
 
     } catch (e) {
