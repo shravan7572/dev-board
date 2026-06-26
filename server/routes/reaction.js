@@ -76,9 +76,4 @@ ReactionRoute.post("/:username", async function (req, res) {
 
 })
 
-
-
-
-
-
 module.exports = ReactionRoute;
