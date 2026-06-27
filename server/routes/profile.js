@@ -50,7 +50,7 @@ Profileroute.get("/:username", async (req, res) => {
 
 Profileroute.put("/", User_Auth, async (req, res) => {
 
-    const { name, bio, photo, github, linkedin, twitter } = req.body;
+    const { githubUsername, bio, photo, github, linkedin, twitter } = req.body;
 
     try {
         const userprofile = await UserModel.findByIdAndUpdate(
