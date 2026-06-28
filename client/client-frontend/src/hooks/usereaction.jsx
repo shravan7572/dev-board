@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getReactions, toggleReaction } from "../api/reactions"
+import { getreaction, addreaction } from "../api/reaction"
 
 export function useReactions(username) {
     return useQuery({
