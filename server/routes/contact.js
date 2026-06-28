@@ -26,7 +26,8 @@ ContactRoute.post("/:username", async function (req, res) {
 
 
     const info=    await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+            // from: process.env.EMAIL_USER,
+            from: email,
             to:user.email,
             subject: `New message from ${name}!`,
             html: `
@@ -43,7 +44,7 @@ ContactRoute.post("/:username", async function (req, res) {
         })
 
         await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+            from:user.email,
             to: email,
             subject: `Thanks for contacting ${username}`,
             html: `
@@ -52,7 +53,7 @@ ContactRoute.post("/:username", async function (req, res) {
         <p>${username} has received your message and will reply soon.</p>
         <br/>
         <p><b>Your message:</b></p>
-        <p>${message}</p>
+        <p></p>
       `,
 
         })

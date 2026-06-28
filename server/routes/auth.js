@@ -69,12 +69,14 @@ userroutes.post("/auth/signup", async function (req, res) {
 
 
 userroutes.post("/auth/login", async function (req, res) {
-    const { username, email, password } = req.body
+    const {  email, password } = req.body
+    
 
     const userlogin = await UserModel.findOne({
         email: email
     })
 
+    console.log("USER FOUND:", userlogin) 
     if (!userlogin) {
         return res.status(404).json({
             message: "user not  exist"
@@ -98,6 +100,7 @@ userroutes.post("/auth/login", async function (req, res) {
 
         res.json({
             token,
+               username: userlogin.username,
             message: "login successfully!!"
         })
     } catch (e) {
