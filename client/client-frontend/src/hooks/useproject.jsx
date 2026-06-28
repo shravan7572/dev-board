@@ -5,7 +5,9 @@ export function useProject(username){
     return useQuery({
         queryKey:["project",username],
         queryFn:()=>getproject(username),
-        enabled: !!username
+        enabled: !!username,
+        staleTime: 1000 * 60 * 5,  // ← add this! cache for 5 mins
+        refetchOnWindowFocus: false  
     })
 }
 
@@ -15,7 +17,9 @@ export function useAddProject(username){
         mutationFn:addproject,
         onSuccess:()=>{
             queryclient.invalidateQueries(['project',username])
-        }
+        },
+        staleTime: 1000 * 60 * 5,  // ← add this! cache for 5 mins
+        refetchOnWindowFocus: false  
         
     })
 }
@@ -26,7 +30,9 @@ export function useUpdateProject(username){
         mutationFn:({id,data})=>updatedproject(id,data),
         onSuccess:()=>{
             queryclient.invalidateQueries(['project',username])
-        }
+        },
+        staleTime: 1000 * 60 * 5,  // ← add this! cache for 5 mins
+        refetchOnWindowFocus: false  
         
     })
 }
@@ -38,7 +44,8 @@ export function usedeleteProject(username){
         onSuccess:()=>{
             queryclient.invalidateQueries(['project',username])
         },
-        
+        staleTime: 1000 * 60 * 5,  // ← add this! cache for 5 mins
+        refetchOnWindowFocus: false  
         
     })
 }

@@ -2,13 +2,16 @@ const express = require("express");
 const { ProjectModel } = require("../models/projectdb");
 const User_Auth = require("../middleware/User_Auth");
 const { UserModel } = require("../models/user");
-
+const projectupload = require("../utils/projectupload")
 const ProjectRoute = express.Router();
 
-ProjectRoute.post("/project", User_Auth, async (req, res) => {
-
+ProjectRoute.post("/project", User_Auth,  projectupload.single("thumbnail"),async (req, res) => {
+      console.log("REQ BODY:", req.body)      // ← add
+    console.log("REQ FILE:", req.file)      // ← add
+    console.log("REQ USERID:", req.userid)
+const thumbnail=req.file?.path||""
     try {
-        const { title, description, techstack, liveurl, githuburl, thumbnail, featured } = req.body;
+        const { title, description, techstack, liveurl, githuburl, featured } = req.body;
         const projectdetail = await ProjectModel.create({
             userid: req.userid,
             title: title,
@@ -33,9 +36,10 @@ ProjectRoute.post("/project", User_Auth, async (req, res) => {
 
 ProjectRoute.get("/project/:username", async function (req, res) {
     const username = req.params.username;
+     console.log("FETCHING PROJECTS FOR:", username)
     try {
         const checkusername = await UserModel.findOne({ username: username }).select("-password");
-
+console.log("USER FOUND:", checkusername?._id)
         if (!checkusername) {
             return res.status(404).json({
                 message: "user not found"
@@ -43,7 +47,7 @@ ProjectRoute.get("/project/:username", async function (req, res) {
         }
 
         const projectdetailshow = await ProjectModel.find({ userid: checkusername.id }).sort({ featured: -1 });
-
+console.log("PROJECTS FOUND:", projectdetailshow.length)
 
         res.json({ projectdetailshow })
 

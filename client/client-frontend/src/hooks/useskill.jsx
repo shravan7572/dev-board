@@ -1,30 +1,36 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getSkills, addSkill, deleteSkill } from "../api/skills"
+import { getskills, addskills, deleteskills } from "../api/skills"
 
 export function useSkills(username) {
     return useQuery({
         queryKey: ["skills", username],
-        queryFn: () => getSkills(username),
-        enabled: !!username
+        queryFn: () => getskills(username),
+        enabled: !!username,
+        staleTime: 1000 * 60 * 5,  // ← add this! cache for 5 mins
+        refetchOnWindowFocus: false  
     })
 }
 
 export function useAddSkill(username) {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: addSkill,
+        mutationFn: addskills,
         onSuccess: () => {
             queryClient.invalidateQueries(["skills", username])
-        }
+        },
+        staleTime: 1000 * 60 * 5,  // ← add this! cache for 5 mins
+        refetchOnWindowFocus: false  
     })
 }
 
 export function useDeleteSkill(username) {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: deleteSkill,
+        mutationFn: deleteskills,
         onSuccess: () => {
             queryClient.invalidateQueries(["skills", username])
-        }
+        },
+        staleTime: 1000 * 60 * 5,  // ← add this! cache for 5 mins
+        refetchOnWindowFocus: false  
     })
 }
