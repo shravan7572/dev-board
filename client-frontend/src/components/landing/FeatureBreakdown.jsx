@@ -1,126 +1,83 @@
-function ContributionGraph() {
-  // deterministic intensity pattern, grayscale to match the palette
-  const shades = ["bg-gray-100", "bg-gray-300", "bg-gray-500", "bg-black"]
-  const cells = Array.from({ length: 7 * 14 }, (_, i) => shades[(i * 7 + (i % 5)) % 4])
-  return (
-    <div className="grid grid-flow-col grid-rows-7 gap-[3px]">
-      {cells.map((c, i) => (
-        <span key={i} className={`h-[10px] w-[10px] rounded-[2px] ${c}`} />
-      ))}
-    </div>
-  )
-}
-
-function SkillBars() {
-  const skills = [
-    { name: "TypeScript", pct: "90%" },
-    { name: "Go", pct: "70%" },
-    { name: "Rust", pct: "45%" },
-  ]
-  return (
-    <div className="flex w-56 flex-col gap-3">
-      {skills.map((s) => (
-        <div key={s.name}>
-          <div className="mb-1 flex justify-between font-mono text-[12px] text-gray-500">
-            <span>{s.name}</span>
-            <span>{s.pct}</span>
-          </div>
-          <div className="h-1.5 w-full rounded-full bg-gray-100">
-            <div className="h-1.5 rounded-full bg-black" style={{ width: s.pct }} />
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function BlogRows() {
-  const posts = [
-    { title: "Why I stopped using ORMs", meta: "4 min" },
-    { title: "Shipping on the edge", meta: "7 min" },
-  ]
-  return (
-    <div className="w-64">
-      {posts.map((p, i) => (
-        <div
-          key={p.title}
-          className={`flex items-center justify-between py-2 ${i > 0 ? "border-t border-gray-100" : ""}`}
-        >
-          <span className="text-[13px] text-black">{p.title}</span>
-          <span className="font-mono text-[12px] text-gray-400">{p.meta}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function Reactions() {
-  const items = [
-    { icon: "👍", count: 24 },
-    { icon: "🔥", count: 18 },
-    { icon: "🧠", count: 9 },
-  ]
-  return (
-    <div className="flex items-center gap-2">
-      {items.map((r) => (
-        <span
-          key={r.icon}
-          className="flex items-center gap-1.5 rounded-full border border-gray-200 px-2.5 py-1 font-mono text-[12px] text-gray-600"
-        >
-          <span aria-hidden="true">{r.icon}</span>
-          {r.count}
-        </span>
-      ))}
-    </div>
-  )
-}
-
 const FEATURES = [
   {
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+      </svg>
+    ),
     title: "GitHub activity",
-    desc: "Live contribution graph and pinned repos, synced automatically.",
-    snippet: <ContributionGraph />,
+    desc: "Contribution graph, pinned repos, and commit streaks — synced automatically from your GitHub account.",
   },
   {
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+      </svg>
+    ),
     title: "Skills & stack",
-    desc: "Tag-based, searchable, self-reported. Show what you actually use.",
-    snippet: <SkillBars />,
+    desc: "Tag every tool you use. Add years of experience. Featured skills stand out to recruiters and collaborators.",
   },
   {
-    title: "Learning journey",
-    desc: "A timeline of what you are currently learning and building.",
-    snippet: <BlogRows />,
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M9 21V9" />
+      </svg>
+    ),
+    title: "Project showcase",
+    desc: "Live links, GitHub URLs, tech stack tags, and a thumbnail. Everything a hiring manager needs in one card.",
   },
   {
-    title: "Blog & writing",
-    desc: "Markdown posts with reactions from other developers.",
-    snippet: <Reactions />,
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
+      </svg>
+    ),
+    title: "Contact form",
+    desc: "Visitors can reach you directly from your profile. No email exposed. Messages go straight to you.",
+  },
+  {
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+      </svg>
+    ),
+    title: "Reactions",
+    desc: "Visitors can react to your profile with 🔥 ❤️ 👏 — see who's engaging with your work in real time.",
+  },
+  {
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+      </svg>
+    ),
+    title: "Profile analytics",
+    desc: "Track who's viewing your profile. Total views, browser breakdown, and visit patterns — all private to you.",
   },
 ]
 
 function FeatureBreakdown() {
   return (
-    <section id="docs" className="mx-auto max-w-6xl px-6 py-24">
-      <p className="font-mono text-[11px] uppercase tracking-widest text-gray-400">what&apos;s included</p>
-      <h2 className="mt-3 max-w-xl text-[32px] font-medium tracking-[-0.01em] text-balance text-black">
-        Everything a developer&apos;s profile should have
-      </h2>
+    <section id="features" className="features-section">
+      <div className="features-inner">
+        <div className="features-header">
+          <p className="section-eyebrow">what's included</p>
+          <h2 className="section-heading">
+            Everything a developer's<br />profile should have
+          </h2>
+          <p className="section-sub">
+            Built specifically for developers. No fluff, no templates, no drag-and-drop.
+          </p>
+        </div>
 
-      <div className="mt-10">
-        {FEATURES.map((f, i) => (
-          <div
-            key={f.title}
-            className={`flex flex-col gap-6 py-8 md:flex-row md:items-center md:justify-between ${
-              i > 0 ? "border-t border-gray-100" : ""
-            }`}
-          >
-            <div className="max-w-sm">
-              <h3 className="text-[16px] font-medium text-black">{f.title}</h3>
-              <p className="mt-1 text-[14px] leading-relaxed text-gray-500">{f.desc}</p>
+        <div className="features-grid">
+          {FEATURES.map((f) => (
+            <div key={f.title} className="feature-card">
+              <div className="feature-icon">{f.icon}</div>
+              <h3 className="feature-title">{f.title}</h3>
+              <p className="feature-desc">{f.desc}</p>
             </div>
-            <div className="shrink-0">{f.snippet}</div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   )

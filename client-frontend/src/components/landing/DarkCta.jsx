@@ -1,35 +1,41 @@
 function DarkCta({ name, setName, onClaim }) {
+  const clean = name.trim().toLowerCase()
+
   return (
-    <section id="changelog" className="bg-black">
-      <div className="mx-auto max-w-6xl px-6 py-24 text-center">
-        <h2 className="text-[32px] font-medium tracking-[-0.01em] text-balance text-white md:text-[40px]">
-          Your profile should be this good.
+    <section className="dark-cta-section">
+      {/* subtle grid on dark bg */}
+      <div className="dark-cta-grid" aria-hidden="true" />
+
+      <div className="dark-cta-inner">
+        <div className="dark-cta-badge">Free forever · No credit card</div>
+
+        <h2 className="dark-cta-heading">
+          Your profile is<br />waiting for you
         </h2>
-        <p className="mt-3 text-[14px] text-gray-400">
-          Free. No design skills needed. Takes 3 minutes.
+        <p className="dark-cta-sub">
+          Takes 3 minutes. Looks like you spent 3 days on it.
         </p>
 
-        <div className="mx-auto mt-8 flex max-w-md flex-col items-stretch gap-2 sm:flex-row">
-          <div className="flex h-11 flex-1 items-center rounded-[6px] bg-white px-3 font-mono text-[14px] text-black">
-            <span className="text-gray-400">devboard.app/</span>
+        <div className="dark-cta-input-row">
+          <div className="dark-cta-input-wrap">
+            <span className="dark-cta-prefix">devboard.app/</span>
             <input
               value={name}
               onChange={(e) => setName(e.target.value.replace(/\s/g, ""))}
               placeholder="yourname"
-              className="ml-0.5 w-full bg-transparent text-black placeholder:text-gray-400 focus:outline-none"
+              className="dark-cta-input"
               aria-label="Choose your devboard username"
+              autoComplete="off"
+              spellCheck={false}
             />
           </div>
-          <button
-            onClick={onClaim}
-            className="h-11 shrink-0 rounded-[6px] bg-white px-4 text-[14px] font-medium text-black transition-colors duration-150 hover:bg-gray-200"
-          >
-            Claim profile
+          <button onClick={onClaim} className="dark-cta-btn">
+            Claim yours →
           </button>
         </div>
 
-        <p className="mt-4 font-mono text-[12px] text-gray-500">
-          devboard.app/yourname · always free
+        <p className="dark-cta-note">
+          {clean ? `devboard.app/${clean}` : "devboard.app/yourname"} · always free · no ads
         </p>
       </div>
     </section>

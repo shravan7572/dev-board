@@ -1,78 +1,94 @@
 const PROFILES = [
   {
     initials: "AR",
+    color: "#dbeafe",
+    textColor: "#1d4ed8",
     name: "Aditi Rao",
-    title: "Frontend engineer",
-    skills: ["React", "TypeScript", "CSS"],
+    title: "Frontend engineer · Bengaluru",
+    skills: ["React", "TypeScript", "Figma"],
     projects: 12,
-    contributions: 318,
+    commits: 318,
     username: "aditi",
+    quote: "Got 3 interview calls the week I launched my devboard.",
   },
   {
     initials: "JL",
+    color: "#dcfce7",
+    textColor: "#15803d",
     name: "Jordan Lee",
-    title: "Platform engineer",
+    title: "Platform engineer · San Francisco",
     skills: ["Go", "Kubernetes", "gRPC"],
     projects: 8,
-    contributions: 472,
+    commits: 472,
     username: "jordanl",
+    quote: "My devboard replaced my portfolio site entirely.",
   },
   {
     initials: "MK",
+    color: "#fce7f3",
+    textColor: "#be185d",
     name: "Maya Khan",
-    title: "ML engineer",
+    title: "ML engineer · London",
     skills: ["Python", "PyTorch", "Rust"],
     projects: 15,
-    contributions: 256,
+    commits: 256,
     username: "maya",
+    quote: "The GitHub chart alone made my profile 10× more impressive.",
   },
 ]
 
 function SocialProof() {
   return (
-    <section id="profiles" className="mx-auto max-w-6xl px-6 py-24">
-      <p className="font-mono text-[11px] uppercase tracking-widest text-gray-400">built by developers</p>
-      <h2 className="mt-3 text-[32px] font-medium tracking-[-0.01em] text-black">
-        See what others have built
-      </h2>
+    <section id="profiles" className="social-proof-section">
+      <div className="social-proof-inner">
+        <p className="section-eyebrow">developers love it</p>
+        <h2 className="section-heading">Real profiles, real developers</h2>
+        <p className="section-sub">
+          The modern workspace for developers.
+        </p>
 
-      <div className="mt-10 grid gap-5 md:grid-cols-3">
-        {PROFILES.map((p) => (
-          <div key={p.username}>
-            <a
-              href="#"
-              className="block rounded-[8px] border border-gray-100 bg-white p-5 transition-colors duration-150 hover:border-gray-300"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-[13px] font-medium text-gray-600">
+        <div className="proof-grid">
+          {PROFILES.map((p) => (
+            <div key={p.username} className="proof-card">
+              {/* quote */}
+              <p className="proof-quote">"{p.quote}"</p>
+
+              {/* divider */}
+              <div className="proof-divider" />
+
+              {/* profile row */}
+              <div className="proof-profile-row">
+                <div
+                  className="proof-avatar"
+                  style={{ background: p.color, color: p.textColor }}
+                >
                   {p.initials}
                 </div>
                 <div>
-                  <p className="text-[14px] font-medium text-black">{p.name}</p>
-                  <p className="text-[13px] text-gray-500">{p.title}</p>
+                  <p className="proof-name">{p.name}</p>
+                  <p className="proof-title">{p.title}</p>
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-1.5">
+              {/* skills */}
+              <div className="proof-skills">
                 {p.skills.map((s) => (
-                  <span
-                    key={s}
-                    className="rounded-full bg-gray-100 px-2.5 py-1 font-mono text-[12px] text-gray-600"
-                  >
-                    {s}
-                  </span>
+                  <span key={s} className="proof-skill">{s}</span>
                 ))}
               </div>
 
-              <div className="mt-4 flex items-center gap-4 font-mono text-[12px] text-gray-400">
+              {/* stats */}
+              <div className="proof-stats">
                 <span>{p.projects} projects</span>
-                <span className="text-gray-300">·</span>
-                <span>{p.contributions} commits this month</span>
+                <span className="proof-dot">·</span>
+                <span>{p.commits} commits</span>
               </div>
-            </a>
-            <p className="mt-2 font-mono text-[12px] text-gray-400">devboard.app/{p.username}</p>
-          </div>
-        ))}
+
+              {/* url */}
+              <a href="#" className="proof-url">devboard.app/{p.username} ↗</a>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )

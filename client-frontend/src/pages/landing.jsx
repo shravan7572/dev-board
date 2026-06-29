@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useMutation } from "@tanstack/react-query"
 import { login, signup } from "../api/auth"
+import "./landing.css"
 import LandingNav from "../components/landing/LandingNav"
 import Hero from "../components/landing/Hero"
 import UrlClaimer from "../components/landing/UrlClaimer"
@@ -71,7 +72,7 @@ function Landing() {
       <LandingNav onClaim={() => openModal("signup")} />
 
       <main className="bg-gray-50">
-        <Hero onClaim={() => openModal("signup")} />
+        <Hero claimName={claimName} setClaimName={setClaimName} onClaim={() => openModal("signup")} />
 
         <div className="bg-white">
           <UrlClaimer name={claimName} setName={setClaimName} onClaim={() => openModal("signup")} />
