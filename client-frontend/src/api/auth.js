@@ -2,10 +2,8 @@ import axios from "axios"
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-export const signup = (data) =>{
-    console.log("API SIGNUP CALLED:", BASE_URL, data)  
-   return axios.post(`${BASE_URL}/api/auth/signup`, data)
-}
+export const signup = (data) =>
+   axios.post(`${BASE_URL}/api/auth/signup`, data)
 export const login = (data) =>{
      return axios.post(`${BASE_URL}/api/auth/login`, data)
 }

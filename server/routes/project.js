@@ -2,141 +2,146 @@ const express = require("express");
 const { ProjectModel } = require("../models/projectdb");
 const User_Auth = require("../middleware/User_Auth");
 const { UserModel } = require("../models/user");
-const projectupload = require("../utils/projectupload")
+const projectupload = require("../utils/projectupload");
 const ProjectRoute = express.Router();
 
-ProjectRoute.post("/project", User_Auth,  projectupload.single("thumbnail"),async (req, res) => {
-      console.log("REQ BODY:", req.body)      // ← add
-    console.log("REQ FILE:", req.file)      // ← add
-    console.log("REQ USERID:", req.userid)
-const thumbnail=req.file?.path||""
+function parseTechstack(techstack) {
+    if (Array.isArray(techstack)) return techstack;
+    if (typeof techstack === "string" && techstack.trim()) {
+        return techstack.split(",").map((item) => item.trim()).filter(Boolean);
+    }
+    return [];
+}
+
+function parseFeatured(value) {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "string") return value === "true";
+    return false;
+}
+
+ProjectRoute.post("/project", User_Auth, projectupload.single("thumbnail"), async (req, res) => {
+    const thumbnail = req.file?.path || "";
+
     try {
         const { title, description, techstack, liveurl, githuburl, featured } = req.body;
+
+        if (!title) {
+            return res.status(400).json({ message: "Project title is required" });
+        }
+
         const projectdetail = await ProjectModel.create({
             userid: req.userid,
-            title: title,
-            description: description,
-            techstack: techstack,
-            liveurl: liveurl,
-            githuburl: githuburl
-            , thumbnail: thumbnail,  
-            featured: featured
-        })
-        res.json({ message: "detail added !", projectdetail })
+            title,
+            description,
+            techstack: parseTechstack(techstack),
+            liveurl,
+            githuburl,
+            thumbnail,
+            featured: parseFeatured(featured),
+        });
 
-    }
-    catch (e) {
+        res.status(201).json({ message: "Project added", projectdetail });
+    } catch (e) {
         res.status(500).json({
-            message: e.message
-        })
+            message: e.message,
+        });
     }
-
-
-})
+});
 
 ProjectRoute.get("/project/:username", async function (req, res) {
     const username = req.params.username;
-     console.log("FETCHING PROJECTS FOR:", username)
+
     try {
-        const checkusername = await UserModel.findOne({ username: username }).select("-password");
-console.log("USER FOUND:", checkusername?._id)
+        const checkusername = await UserModel.findOne({ username }).select("-password");
+
         if (!checkusername) {
             return res.status(404).json({
-                message: "user not found"
-            })
+                message: "User not found",
+            });
         }
 
-        const projectdetailshow = await ProjectModel.find({ userid: checkusername.id }).sort({ featured: -1 });
-console.log("PROJECTS FOUND:", projectdetailshow.length)
+        const projectdetailshow = await ProjectModel.find({
+            userid: checkusername._id.toString(),
+        }).sort({ featured: -1 });
 
-        res.json({ projectdetailshow })
-
+        res.json({ projectdetailshow });
     } catch (e) {
-
         res.status(500).json({
-            message: "something went wrong"
-        })
-
+            message: "Something went wrong",
+        });
     }
-
-})
+});
 
 ProjectRoute.put("/project/update/:id", User_Auth, async function (req, res) {
-
-    const { title, description, techstack, liveurl, githuburl, thumbnail, featured } = req.body;
-
-    const id = req.params.id;
     try {
         const checkid = await ProjectModel.findById(req.params.id);
 
         if (!checkid) {
             return res.status(404).json({
-                message: "Project not Found"
-            })
+                message: "Project not found",
+            });
         }
 
         if (checkid.userid !== req.userid) {
             return res.status(403).json({
-                message: "not auhtenticatied"
-            })
+                message: "Not authorized",
+            });
+        }
+
+        const updates = {};
+        const allowed = ["title", "description", "techstack", "liveurl", "githuburl", "thumbnail", "featured"];
+        for (const field of allowed) {
+            if (req.body[field] !== undefined) {
+                updates[field] = field === "techstack"
+                    ? parseTechstack(req.body[field])
+                    : field === "featured"
+                        ? parseFeatured(req.body[field])
+                        : req.body[field];
+            }
         }
 
         const updatedprojectdetail = await ProjectModel.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            updates,
             { new: true }
-        )
+        );
 
         res.json({
-            updatedprojectdetail
-        })
-
-
+            updatedprojectdetail,
+        });
     } catch (e) {
         res.status(500).json({
-            message: e.message
-        })
-
+            message: e.message,
+        });
     }
-
-})
+});
 
 ProjectRoute.delete("/project/:id", User_Auth, async function (req, res) {
-
-    const id = req.params.id;
     try {
         const checkid = await ProjectModel.findById(req.params.id);
 
         if (!checkid) {
             return res.status(404).json({
-                message: "Project not Found"
-            })
+                message: "Project not found",
+            });
         }
 
         if (checkid.userid !== req.userid) {
             return res.status(403).json({
-                message: "not auhtenticatied"
-            })
+                message: "Not authorized",
+            });
         }
 
-        const updatedprojectdetail = await ProjectModel.findByIdAndDelete(req.params.id)
+        await ProjectModel.findByIdAndDelete(req.params.id);
 
         res.json({
-            message: "project Deleted Successfully!!!"
-        })
-
-
+            message: "Project deleted successfully",
+        });
     } catch (e) {
         res.status(500).json({
-            message: e.message
-        })
-
+            message: e.message,
+        });
     }
+});
 
-})
-
-
-
-
-
-module.exports = ProjectRoute
+module.exports = ProjectRoute;

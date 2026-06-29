@@ -6,9 +6,9 @@ export function useProflie(username) {
         queryKey: ["Profile", username],
         queryFn: () => getprofile(username),
         enabled: !!username,
-        staleTime: 1000 * 60 * 5,  // ← add this! cache for 5 mins
-        refetchOnWindowFocus: false  
-    })
+        staleTime: 1000 * 60 * 5,
+        refetchOnWindowFocus: false,
+    });
 }
 
 export function useUpdateProfile() {
@@ -16,9 +16,7 @@ export function useUpdateProfile() {
     return useMutation({
         mutationFn: updateprofle,
         onSuccess: () => {
-            queryclient.invalidateQueries(["profile "])
+            queryclient.invalidateQueries({ queryKey: ["Profile"] });
         },
-        staleTime: 1000 * 60 * 5,  // ← add this! cache for 5 mins
-        refetchOnWindowFocus: false  
-    })
+    });
 }

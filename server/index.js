@@ -1,12 +1,18 @@
 require("dotenv").config();
-const express=require("express");
-const mongoose=require("mongoose");
-const cors=require("cors")
-const app=express();
-app.use(express.json())
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+
+const app = express();
+const PORT = process.env.PORT || 5001;
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+
+app.set("trust proxy", 1);
+app.use(express.json());
 app.use(cors({
-    origin: "http://localhost:5173"
-}))
+    origin: CLIENT_URL,
+    credentials: true,
+}));
 
 const userroutes=require("./routes/auth");
 const Profileroute=require("./routes/profile");
@@ -32,9 +38,12 @@ app.use("/api/fetch",GithubRoute);
 
 
 mongoose.connect(process.env.MONGO_URL)
-  .then(() => console.log("MongoDB Connected "))
-  .catch((err) => console.log("MongoDB Error ", err));
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => {
+    console.error("MongoDB connection error:", err.message);
+    process.exit(1);
+  });
 
-app.listen(5001, "0.0.0.0",()=>{
-    console.log("You're server is running on http://localhost:5001/")
-})
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+});

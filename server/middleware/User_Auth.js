@@ -5,9 +5,9 @@ function User_Auth(req, res, next) {
     const token = req.headers.token;
 
     if (!token) {
-        return res.json({
-            messgae: " token not provided"
-        })
+        return res.status(401).json({
+            message: "Token not provided",
+        });
     }
 
     try {
@@ -15,9 +15,9 @@ function User_Auth(req, res, next) {
         req.userid = Usercheck.id;
         next();
     } catch (e) {
-        res.json({
-            messgae: "invalid token"
-        })
+        return res.status(401).json({
+            message: "Invalid token",
+        });
     }
 }
 
