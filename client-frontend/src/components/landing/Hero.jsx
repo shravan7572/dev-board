@@ -10,15 +10,20 @@ function FloatingCard() {
   const tabs = ["Projects", "Skills", "GitHub"]
   const content = {
     Projects: [
-      { name: "devboard", lang: "TypeScript", stars: "1.2k" },
-      { name: "edge-cache", lang: "Rust", stars: "340" },
-      { name: "mdx-notes", lang: "Go", stars: "88" },
+      { name: "devboard", lang: "MERN", stars: "1.2k" },
+      { name: "Snap-Url", lang: "React", stars: "340" },
+      { name: "Jan-ken-pon", lang: "React", stars: "88" },
     ],
     Skills: [
-      { name: "TypeScript", years: "5y", featured: true },
-      { name: "React", years: "4y", featured: true },
-      { name: "PostgreSQL", years: "3y", featured: false },
-      { name: "Rust", years: "1y", featured: false },
+      { name: "React", years: "1y", featured: true },
+      { name: "Node js", years: "1.5", featured: true },
+      { name: "Mongodb", years: "1y", featured: false },
+      { name: "Java Script", years: "1y", featured: false },
+      { name: "Express.js", years: "1y", featured: false },
+      { name: "Python", years: "2y", featured: false },
+      { name: "C", years: "3y", featured: false },
+      { name: "C++", years: "3y", featured: false },
+
     ],
     GitHub: null,
   }
@@ -30,9 +35,9 @@ function FloatingCard() {
     <div className="hero-floating-card">
       {/* card header */}
       <div className="hero-card-header">
-        <div className="hero-card-avatar">SK</div>
+        <div className="hero-card-avatar">SC</div>
         <div>
-          <div className="hero-card-name">Shravan Kumar</div>
+          <div className="hero-card-name">Shravan Choudhary</div>
           <div className="hero-card-handle">@shravan · Full-stack dev</div>
         </div>
         <span className="hero-card-badge">open to work</span>

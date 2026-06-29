@@ -52,16 +52,16 @@ function ProfilePreview({ name }) {
           <div className="preview-profile-wrap">
             {/* sidebar */}
             <div className="preview-sidebar">
-              <div className="preview-avatar">SK</div>
-              <div className="preview-name">Shravan Kumar</div>
+              <div className="preview-avatar">SC</div>
+              <div className="preview-name">Shravan Choudhary</div>
               <div className="preview-role">Full-stack developer</div>
-              <div className="preview-location">Bengaluru, India</div>
+              <div className="preview-location">Pune, India</div>
 
               <span className="preview-badge">open to work</span>
 
               <div className="preview-socials">
-                <span>github.com/shravan</span>
-                <span>twitter.com/shravan</span>
+                <span>github.com/shravan7572</span>
+                <span>twitter.com/shravan3107</span>
               </div>
 
               <div className="preview-reactions">

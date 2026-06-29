@@ -9,6 +9,12 @@ import { trackView } from "../api/analytics"
 import { sendContact } from "../api/contact"
 import { extractGithubUsername, getgithubdata } from "../api/github"
 
+const formatUrl = (url) => {
+    if (!url) return "#";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `https://${url}`;
+};
+
 // ─── helpers ────────────────────────────────────────────────────────────────
 function getInitials(name) {
     if (!name) return "?"
@@ -154,7 +160,7 @@ function PublicProfile() {
 
     // Track view on mount
     useEffect(() => {
-        if (username) trackView(username).catch(() => {})
+        if (username) trackView(username).catch(() => { })
     }, [username])
 
     const toggleReaction = useToggleReaction(username)
@@ -436,6 +442,7 @@ function PublicProfile() {
                                                         )}
                                                     </div>
                                                 </div>
+                                                {/* {console} */}
                                                 {project.description && (
                                                     <p className="project-card-pub-desc">{project.description}</p>
                                                 )}
@@ -448,10 +455,12 @@ function PublicProfile() {
                                                 )}
                                                 <div className="project-card-pub-links">
                                                     {project.liveurl && (
-                                                        <a href={project.liveurl} target="_blank" rel="noreferrer" className="project-pub-link primary">
-                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
-                                                            </svg>
+                                                        <a
+                                                            href={formatUrl(project.liveurl)}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="project-pub-link primary"
+                                                        >
                                                             Live demo
                                                         </a>
                                                     )}
