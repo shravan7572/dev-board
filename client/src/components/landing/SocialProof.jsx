@@ -39,7 +39,7 @@ const PROFILES = [
 
 function SocialProof() {
   return (
-    <section id="profiles" className="social-proof-section" id="profile-preview">
+    <section id="profile" className="social-proof-section">
       <div className="social-proof-inner">
         <p className="section-eyebrow">developers love it</p>
         <h2 className="section-heading">Real profiles, real developers</h2>

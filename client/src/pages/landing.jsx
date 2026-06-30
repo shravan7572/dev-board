@@ -100,9 +100,11 @@ function Landing() {
           <UrlClaimer name={claimName} setName={setClaimName} onClaim={() => openModal("signup")} />
         </div>
 
-        <ProfilePreview name={claimName} />
+        <div id="profiles">
+          <ProfilePreview name={claimName} />
+        </div>
 
-        <div className="bg-white">
+        <div id="features" className="bg-white">
           <FeatureBreakdown />
         </div>
 

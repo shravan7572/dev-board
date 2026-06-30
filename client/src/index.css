@@ -28,6 +28,7 @@
 
 html {
   background-color: var(--color-background);
+  scroll-behavior: smooth;
 }
 
 body {
@@ -38,6 +39,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+
 
 /* ─────────────────────────────────────────────
    PAGE LOAD — staggered fade-in sections

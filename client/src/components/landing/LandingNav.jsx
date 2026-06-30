@@ -20,7 +20,7 @@ function LandingNav({ onClaim }) {
 
         {/* Centered Capsule Links */}
         <div className="landing-nav-capsule">
-          {["features", "profiles"].map((l) => (
+          {["features", "profile"].map((l) => (
             <a key={l} href={`#${l}`} className="landing-nav-capsule-link">
               {l}
             </a>

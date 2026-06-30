@@ -5,7 +5,7 @@ function LandingFooter() {
 
   const linkActions = {
     "Features":  () => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" }),
-    "Profiles":   () => document.getElementById("profile-preview")?.scrollIntoView({ behavior: "smooth" }),
+    "Profile":   () => document.getElementById("profile")?.scrollIntoView({ behavior: "smooth" }),
     "Claim Url": () => document.getElementById("hero")?.scrollIntoView({ behavior: "smooth" }),
     "Preview":   () => document.getElementById("preview")?.scrollIntoView({ behavior: "smooth" }),
     "GitHub":    () => window.open("https://github.com/shravan7572/dev-board", "_blank"),
@@ -26,7 +26,7 @@ function LandingFooter() {
 
           <div className="landing-footer-cols">
             {[
-              { heading: "Product", links: ["Features", "Profiles", "Claim Url", "Preview"] },
+              { heading: "Product", links: ["Features", "Profile", "Claim Url", "Preview"] },
               { heading: "Connect", links: ["GitHub", "Twitter", "Contact"] },
             ].map((col) => (
               <div key={col.heading}>
