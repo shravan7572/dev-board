@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useMutation } from "@tanstack/react-query"
-import { login, signup, verifyOtp } from "../api/auth"
+import { login, signup, verifyOtp, resendOtp } from "../api/auth"
 import "./landing.css"
 import LandingNav from "../components/landing/LandingNav"
 import Hero from "../components/landing/Hero"
@@ -59,6 +59,16 @@ function Landing() {
     },
     onError: (err) => {
       seterror(err.response?.data?.message || "Verification failed")
+    },
+  })
+
+  const resendotpmutation = useMutation({
+    mutationFn: resendOtp,
+    onSuccess: () => {
+      seterror("A new OTP has been sent to your email.")
+    },
+    onError: (err) => {
+      seterror(err.response?.data?.message || "Failed to resend OTP")
     },
   })
 
@@ -155,6 +165,17 @@ function Landing() {
                   >
                     {otpverifyhydration.isPending ? "Verifying..." : "Verify OTP"}
                   </button>
+
+                  <div className="mt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => resendotpmutation.mutate({ email })}
+                      disabled={resendotpmutation.isPending}
+                      className="text-[12px] font-medium text-gray-500 hover:text-black disabled:opacity-50 hover:underline"
+                    >
+                      {resendotpmutation.isPending ? "Resending code..." : "Resend code"}
+                    </button>
+                  </div>
                 </>
               ) : (
                 <>

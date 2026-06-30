@@ -42,25 +42,33 @@ userroutes.post("/auth/signup", async function (req, res) {
 
         const userexistornot = await UserModel.findOne({ email });
 
-        if (userexistornot) {
-            return res.status(400).json({
-                message: "Email already exists",
-            });
-        }
-
         const otp = generateOTP();
         const otpexpiry = new Date(Date.now() + 10 * 60 * 1000);
-
         const hashedpassword = await bcrypt.hash(password, 9);
 
-        await UserModel.create({
-            username,
-            email,
-            password: hashedpassword,
-            isVerified: false,
-            otp,
-            otpexpiry
-        });
+        if (userexistornot) {
+            if (userexistornot.isVerified) {
+                return res.status(400).json({
+                    message: "Email already exists",
+                });
+            } else {
+                // Update existing unverified user record with new signup details
+                userexistornot.username = username;
+                userexistornot.password = hashedpassword;
+                userexistornot.otp = otp;
+                userexistornot.otpexpiry = otpexpiry;
+                await userexistornot.save();
+            }
+        } else {
+            await UserModel.create({
+                username,
+                email,
+                password: hashedpassword,
+                isVerified: false,
+                otp,
+                otpexpiry
+            });
+        }
 
         // Send verification email in the background without blocking the response
         transporter.sendMail({
@@ -110,6 +118,46 @@ userroutes.post("/auth/otp-verify", async function (req, res) {
     await user.save()
     res.json({ message: "OTP verified successfully" })
 
+})
+
+userroutes.post("/auth/resend-otp", async function (req, res) {
+    const { email } = req.body
+
+    if (!email) {
+        return res.status(400).json({ message: "Email is required" })
+    }
+
+    try {
+        const user = await UserModel.findOne({ email })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        if (user.isVerified) {
+            return res.status(400).json({ message: "Email is already verified" })
+        }
+
+        const otp = generateOTP()
+        const otpexpiry = new Date(Date.now() + 10 * 60 * 1000)
+
+        user.otp = otp
+        user.otpexpiry = otpexpiry
+        await user.save()
+
+        // Send new OTP email in background
+        transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Verify your DevBoard account - Resend OTP",
+            html: `<h2>Your OTP is: ${otp}</h2><p>Expires in 10 minutes</p>`
+        }).catch(err => {
+            console.error("Resend OTP email sending failed:", err)
+        })
+
+        res.json({ message: "OTP resent successfully" })
+    } catch (e) {
+        res.status(500).json({ message: e.message })
+    }
 })
 
 userroutes.post("/auth/login", async function (req, res) {
