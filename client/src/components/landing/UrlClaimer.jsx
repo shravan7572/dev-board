@@ -7,7 +7,7 @@ function UrlClaimer({ name, setName, onClaim }) {
   const available = clean.length > 0 && !taken
 
   return (
-    <section id="pricing" className="url-claimer-section">
+    <section id="hero" className="url-claimer-section">
       <div className="url-claimer-inner">
         <p className="section-eyebrow">your link</p>
         <h2 className="section-heading">

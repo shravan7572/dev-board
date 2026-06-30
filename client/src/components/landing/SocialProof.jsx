@@ -39,7 +39,7 @@ const PROFILES = [
 
 function SocialProof() {
   return (
-    <section id="profiles" className="social-proof-section">
+    <section id="profiles" className="social-proof-section" id="profile-preview">
       <div className="social-proof-inner">
         <p className="section-eyebrow">developers love it</p>
         <h2 className="section-heading">Real profiles, real developers</h2>
@@ -47,7 +47,7 @@ function SocialProof() {
           The modern workspace for developers.
         </p>
 
-        <div className="proof-grid">
+        <div className="proof-grid" >
           {PROFILES.map((p) => (
             <div key={p.username} className="proof-card">
               {/* quote */}

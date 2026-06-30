@@ -103,7 +103,7 @@ function Hero({ claimName, setClaimName, onClaim }) {
   const available = clean.length > 0 && !taken
 
   return (
-    <section className="hero-section-new">
+    <section className="hero-section-new" >
       {/* Set generated image as background on the right, blended nicely */}
       <div className="hero-bg-image-wrapper">
         <img src={heroBg} alt="" className="hero-bg-img" />
@@ -130,9 +130,10 @@ function Hero({ claimName, setClaimName, onClaim }) {
             Projects, GitHub activity, skills, and contact — all on a single
             beautiful profile built for developers who ship.
           </p>
-
+    
           {/* Beautiful Embedded URL Claimer Capsule */}
           <div className="hero-claimer-wrap">
+            
             <div className={`hero-claimer-input-box ${available ? "available" : taken ? "taken" : ""}`}>
               <span className="hero-claimer-prefix">devboard.app/</span>
               <input
@@ -161,6 +162,7 @@ function Hero({ claimName, setClaimName, onClaim }) {
               </p>
             )}
           </div>
+
 
     
         </div>

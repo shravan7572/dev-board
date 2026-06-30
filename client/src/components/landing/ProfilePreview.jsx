@@ -26,7 +26,7 @@ function ProfilePreview({ name }) {
   const handle = name.trim().toLowerCase() || "shravan"
 
   return (
-    <section className="preview-section">
+    <section className="preview-section" id="preview">
       <div className="preview-inner">
         <p className="section-eyebrow">profile preview</p>
         <h2 className="section-heading">What your board looks like</h2>
