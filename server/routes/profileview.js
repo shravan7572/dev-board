@@ -19,7 +19,17 @@ Profileviewroute.get("/stats", User_Auth, async (req, res) => {
             { $group: { _id: "$browser", count: { $sum: 1 } } },
         ]);
 
-        res.json({ totalviews, browserbreakdown });
+        const devicebreakdown = await Profileviewmodel.aggregate([
+            { $match: { profileId } },
+            { $group: { _id: "$device", count: { $sum: 1 } } },
+        ]);
+
+        const osbreakdown = await Profileviewmodel.aggregate([
+            { $match: { profileId } },
+            { $group: { _id: "$os", count: { $sum: 1 } } },
+        ]);
+
+        res.json({ totalviews, browserbreakdown, devicebreakdown, osbreakdown });
     } catch (e) {
         res.status(500).json({ message: e.message });
     }

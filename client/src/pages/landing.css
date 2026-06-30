@@ -436,7 +436,6 @@
   box-shadow: 
     0 25px 50px -12px rgba(120, 110, 95, 0.12),
     0 0 0 1.5px rgba(255, 255, 255, 0.3) inset;
-  animation: floatCard-new 6s ease-in-out infinite;
   transition: border-color 300ms ease;
 }
 

@@ -19,3 +19,10 @@ export const deleteskills = (id) =>
             token: getoken()
         }
     })
+
+export const updateskills = (id, data) =>
+    axios.put(`${BASE_URL}/api/skill/${id}`, data, {
+        headers: {
+            token: getoken()
+        }
+    })

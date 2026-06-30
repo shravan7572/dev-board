@@ -22,8 +22,17 @@ ReactionRoute.get("/:username", async function (req, res) {
             });
         }
 
-        const counts = await getCounts(user._id.toString());
-        res.json({ counts });
+        const profileID = user._id.toString();
+        const visitorID = req.query.visitorId || req.ip;
+        const counts = await getCounts(profileID);
+
+        const userReactions = {
+            fire: !!(await reactionModel.exists({ profileID, visitorID, type: "fire" })),
+            heart: !!(await reactionModel.exists({ profileID, visitorID, type: "heart" })),
+            clap: !!(await reactionModel.exists({ profileID, visitorID, type: "clap" })),
+        };
+
+        res.json({ counts, userReactions });
     } catch (e) {
         res.status(500).json({
             message: e.message,
@@ -41,7 +50,7 @@ ReactionRoute.post("/:username", async function (req, res) {
         }
 
         const profileID = user._id.toString();
-        const visitorID = req.ip;
+        const visitorID = req.body.visitorId || req.ip;
         const { type } = req.body;
 
         if (!["fire", "heart", "clap"].includes(type)) {
@@ -57,7 +66,13 @@ ReactionRoute.post("/:username", async function (req, res) {
         }
 
         const counts = await getCounts(profileID);
-        res.json({ counts });
+        const userReactions = {
+            fire: !!(await reactionModel.exists({ profileID, visitorID, type: "fire" })),
+            heart: !!(await reactionModel.exists({ profileID, visitorID, type: "heart" })),
+            clap: !!(await reactionModel.exists({ profileID, visitorID, type: "clap" })),
+        };
+
+        res.json({ counts, userReactions });
     } catch (e) {
         res.status(500).json({
             message: e.message,

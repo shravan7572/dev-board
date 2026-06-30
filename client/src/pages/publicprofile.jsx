@@ -113,12 +113,12 @@ function GithubChart({ githubUsername }) {
 // ─── Reaction button ─────────────────────────────────────────────────────────
 const reactionEmoji = { fire: "🔥", heart: "❤️", clap: "👏" }
 
-function ReactionButton({ type, count, onClick, isPending }) {
+function ReactionButton({ type, count, onClick, isPending, isActive }) {
     return (
         <button
             onClick={() => onClick(type)}
             disabled={isPending}
-            className="reaction-btn"
+            className={`reaction-btn${isActive ? " active" : ""}`}
             title={`React with ${type}`}
         >
             <span className="reaction-emoji">{reactionEmoji[type]}</span>
@@ -209,9 +209,16 @@ function PublicProfile() {
                     <button onClick={() => navigate("/")} className="profile-nav-logo">
                         devboard
                     </button>
-                    <button onClick={() => navigate("/")} className="profile-nav-cta">
-                        Create yours →
-                    </button>
+                    <div style={{ display: "flex", gap: 8 }}>
+                        {localStorage.getItem("token") && (
+                            <button onClick={() => navigate("/dashboard")} className="profile-nav-cta" style={{ marginRight: 4 }}>
+                                ← Dashboard
+                            </button>
+                        )}
+                        <button onClick={() => navigate("/")} className="profile-nav-cta">
+                            Create yours →
+                        </button>
+                    </div>
                 </nav>
             </header>
 
@@ -258,6 +265,7 @@ function PublicProfile() {
                                     count={reactions[type]}
                                     onClick={(t) => toggleReaction.mutate(t)}
                                     isPending={toggleReaction.isPending}
+                                    isActive={!!(reactionsData?.data?.userReactions?.[type])}
                                 />
                             ))}
                         </div>

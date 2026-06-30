@@ -12,9 +12,9 @@ function LandingFooter() {
 
           <div className="landing-footer-cols">
             {[
-              { heading: "Product", links: ["Features", "Changelog", "Pricing", "Status"] },
-              { heading: "Developers", links: ["Docs", "API", "GitHub sync", "Examples"] },
-              { heading: "Connect", links: ["GitHub", "Twitter", "Discord", "Contact"] },
+              { heading: "Product", links: ["Features", "Profils", "Claim Url", "Preview"] },
+            
+              { heading: "Connect", links: ["GitHub", "Twitter", "Contact"] },
             ].map((col) => (
               <div key={col.heading}>
                 <h3 className="landing-footer-col-heading">{col.heading}</h3>

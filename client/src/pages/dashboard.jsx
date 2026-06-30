@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { useProflie, useUpdateProfile } from "../hooks/useprofile"
-import { useSkills, useAddSkill, useDeleteSkill } from "../hooks/useskill"
+import { useSkills, useAddSkill, useDeleteSkill, useUpdateSkill } from "../hooks/useskill"
 import { useProject, useAddProject, useUpdateProject, usedeleteProject } from "../hooks/useproject"
 import { getStats } from "../api/analytics"
 import { getreaction } from "../api/reaction"
@@ -104,11 +104,14 @@ function Dashboard() {
     const [skillcategory, setSkillcategory] = useState("")
     const [skillYearsExp, setSkillYearsExp] = useState("")
     const [skillFeatured, setSkillFeatured] = useState(false)
+    const [editingSkill, setEditingSkill] = useState(null)
+    const [deletingSkillId, setDeletingSkillId] = useState(null)
+    const [deletingProjectId, setDeletingProjectId] = useState(null)
 
     const { data: skillsdata, isLoading: skillsLoading, isError: skillsError } = useSkills(username)
     const addskillmutation = useAddSkill(username)
     const deleteskillmutation = useDeleteSkill(username)
-    const confirmDeleteSkill = useConfirmDelete(deleteskillmutation)
+    const updateSkillMutation = useUpdateSkill(username)
 
     // ── projects ──────────────────────────────────────────────────────────────
     const [title, setTitle] = useState("")
@@ -126,7 +129,6 @@ function Dashboard() {
     const addprojectmutation = useAddProject(username)
     const updateprojectmutation = useUpdateProject(username)
     const deleteprojectmutation = usedeleteProject(username)
-    const confirmDeleteProject = useConfirmDelete(deleteprojectmutation)
 
     // ── analytics / stats ──────────────────────────────────────────────────
     // Issue 3 fix: call getStats() on mount
@@ -162,7 +164,7 @@ function Dashboard() {
     // ── section animation ─────────────────────────────────────────────────
     const [visibleSections, setVisibleSections] = useState([])
     useEffect(() => {
-        const sections = ["stats", "profile", "skills", "projects"]
+        const sections = ["stats", "profile", "skills", "projects", "analytics"]
         sections.forEach((s, i) => {
             setTimeout(() => setVisibleSections((prev) => [...prev, s]), i * 100)
         })
@@ -178,6 +180,7 @@ function Dashboard() {
         profile: useRef(null),
         skills: useRef(null),
         projects: useRef(null),
+        analytics: useRef(null),
     }
     function scrollTo(section) {
         sectionRefs[section]?.current?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -191,27 +194,64 @@ function Dashboard() {
         updateMutation.mutate({ bio, github, linkedin, twitter, githubUsername, theme })
     }
 
+    function openEditSkill(skill) {
+        setEditingSkill(skill)
+        setSkillname(skill.name || "")
+        setSkilllevel(skill.level || "")
+        setSkillcategory(skill.category || "")
+        setSkillYearsExp(skill.yearsExp || "")
+        setSkillFeatured(skill.featured || false)
+    }
+
+    function cancelEditSkill() {
+        setEditingSkill(null)
+        setSkillname("")
+        setSkilllevel("")
+        setSkillcategory("")
+        setSkillYearsExp("")
+        setSkillFeatured(false)
+    }
+
     function handleAddSkill(e) {
         e?.preventDefault()
-        addskillmutation.mutate(
-            {
-                name: skillname,
-                level: skilllevel,
-                category: skillcategory,
-                yearsExp: skillYearsExp ? Number(skillYearsExp) : undefined,
-                featured: skillFeatured,
-            },
-            {
-                onSuccess: () => {
-                    // Reset skill form fields after successful add
-                    setSkillname("")
-                    setSkilllevel("")
-                    setSkillcategory("")
-                    setSkillYearsExp("")
-                    setSkillFeatured(false)
+        if (editingSkill) {
+            updateSkillMutation.mutate(
+                {
+                    id: editingSkill._id,
+                    data: {
+                        name: skillname,
+                        level: skilllevel,
+                        category: skillcategory,
+                        yearsExp: skillYearsExp ? Number(skillYearsExp) : undefined,
+                        featured: skillFeatured,
+                    },
                 },
-            }
-        )
+                {
+                    onSuccess: () => {
+                        cancelEditSkill()
+                    },
+                }
+            )
+        } else {
+            addskillmutation.mutate(
+                {
+                    name: skillname,
+                    level: skilllevel,
+                    category: skillcategory,
+                    yearsExp: skillYearsExp ? Number(skillYearsExp) : undefined,
+                    featured: skillFeatured,
+                },
+                {
+                    onSuccess: () => {
+                        setSkillname("")
+                        setSkilllevel("")
+                        setSkillcategory("")
+                        setSkillYearsExp("")
+                        setSkillFeatured(false)
+                    },
+                }
+            )
+        }
     }
 
     // Populate edit form when pencil is clicked
@@ -352,6 +392,7 @@ function Dashboard() {
                             { key: "profile", label: "Profile" },
                             { key: "skills", label: "Skills" },
                             { key: "projects", label: "Projects" },
+                            { key: "analytics", label: "Analytics" },
                         ].map(({ key, label }) => (
                             <button
                                 key={key}
@@ -602,18 +643,22 @@ function Dashboard() {
                                 </label>
                             </div>
 
-                            <div className="sm:col-span-3">
+                            <div className="sm:col-span-3" style={{ display: "flex", gap: 10, alignItems: "center" }}>
                                 <SaveButton
                                     type="submit"
-                                    label="Add skill"
-                                    isPending={addskillmutation.isPending}
-                                    isSuccess={addskillmutation.isSuccess}
-                                    isError={addskillmutation.isError}
+                                    label={editingSkill ? "Save skill" : "Add skill"}
+                                    isPending={editingSkill ? updateSkillMutation.isPending : addskillmutation.isPending}
+                                    isSuccess={editingSkill ? updateSkillMutation.isSuccess : addskillmutation.isSuccess}
+                                    isError={editingSkill ? updateSkillMutation.isError : addskillmutation.isError}
                                 />
-                                {addskillmutation.isError && (
-                                    <p className="mt-2 text-xs text-red-500">
-                                        {addskillmutation.error?.response?.data?.message || "Failed to add skill"}
-                                    </p>
+                                {editingSkill && (
+                                    <button
+                                        type="button"
+                                        onClick={cancelEditSkill}
+                                        className="rounded-[6px] px-4 py-2 text-sm text-muted-foreground hover:bg-muted"
+                                    >
+                                        Cancel
+                                    </button>
                                 )}
                             </div>
                         </form>
@@ -640,22 +685,71 @@ function Dashboard() {
 
                         {skills.length > 0 && (
                             <div className="mt-6 max-w-2xl flex flex-wrap gap-2">
-                                {skills.map((skill) => (
-                                    <div key={skill._id} className={`skill-pill item-animate${skill.featured ? " featured" : ""}`}>
-                                        <span>
-                                            {skill.name}
-                                            {skill.level && <span style={{ opacity: 0.6 }}> · {skill.level}</span>}
-                                            {skill.yearsExp && <span style={{ opacity: 0.6 }}> · {skill.yearsExp}y</span>}
-                                        </span>
-                                        <button
-                                            className="skill-remove"
-                                            onClick={() => confirmDeleteSkill(skill._id, skill.name)}
-                                            title={`Remove ${skill.name}`}
+                                {skills.map((skill) => {
+                                    const isDeleting = deletingSkillId === skill._id;
+                                    return (
+                                        <div
+                                            key={skill._id}
+                                            className={`skill-pill item-animate${skill.featured ? " featured" : ""}${isDeleting ? " deleting" : ""}`}
                                         >
-                                            ×
-                                        </button>
-                                    </div>
-                                ))}
+                                            {isDeleting ? (
+                                                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                                    <span style={{ fontSize: 11, color: "#ef4444", fontWeight: 500 }}>Confirm?</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            deleteskillmutation.mutate(skill._id);
+                                                            setDeletingSkillId(null);
+                                                        }}
+                                                        style={{ fontSize: 11, fontWeight: 600, color: "#ef4444", background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                                                    >
+                                                        Yes
+                                                    </button>
+                                                    <span style={{ opacity: 0.3 }}>|</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setDeletingSkillId(null)}
+                                                        style={{ fontSize: 11, fontWeight: 500, color: "#6b7280", background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                                                    >
+                                                        No
+                                                    </button>
+                                                </span>
+                                            ) : (
+                                                <>
+                                                    <span onClick={() => openEditSkill(skill)} style={{ cursor: "pointer" }}>
+                                                        {skill.name}
+                                                        {skill.level && <span style={{ opacity: 0.6 }}> · {skill.level}</span>}
+                                                        {skill.yearsExp && <span style={{ opacity: 0.6 }}> · {skill.yearsExp}y</span>}
+                                                    </span>
+                                                    <div className="skill-actions">
+                                                        {/* Edit icon */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => openEditSkill(skill)}
+                                                            title={`Edit ${skill.name}`}
+                                                            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                                                        >
+                                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                                            </svg>
+                                                        </button>
+                                                        {/* Delete icon */}
+                                                        <button
+                                                            type="button"
+                                                            className="skill-remove animate-none opacity-100 hover:opacity-100 p-0 m-0 ml-0 border-none bg-none h-auto w-auto"
+                                                            onClick={() => setDeletingSkillId(skill._id)}
+                                                            title={`Remove ${skill.name}`}
+                                                            style={{ background: "none", border: "none", padding: 0, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </section>
@@ -737,39 +831,176 @@ function Dashboard() {
                                                     )}
                                                 </div>
 
-                                                {/* Hover-reveal edit + delete buttons (Issue 5 UI) */}
-                                                <div className="project-actions" style={{ flexShrink: 0 }}>
-                                                    {/* Pencil — edit */}
-                                                    <button
-                                                        onClick={() => openEditProject(project)}
-                                                        title="Edit project"
-                                                        className="rounded-[6px] p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                                    >
-                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                                        </svg>
-                                                    </button>
-                                                    {/* Trash — delete */}
-                                                    <button
-                                                        onClick={() => confirmDeleteProject(project._id, `"${project.title}"`)}
-                                                        title="Delete project"
-                                                        className="rounded-[6px] p-1.5 text-muted-foreground hover:bg-red-50 hover:text-red-500"
-                                                    >
-                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                            <polyline points="3 6 5 6 21 6" />
-                                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                                            <path d="M10 11v6M14 11v6" />
-                                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
+                                                {/* Hover-reveal edit + delete buttons or Inline Confirm */}
+                                                {deletingProjectId === project._id ? (
+                                                    <div style={{ display: "flex", gap: 6, alignItems: "center", background: "#fef2f2", padding: "4px 8px", borderRadius: 6, border: "1px solid #fca5a5", flexShrink: 0 }}>
+                                                        <span style={{ fontSize: 11, color: "#ef4444", fontWeight: 500 }}>Confirm?</span>
+                                                        <button
+                                                            onClick={() => {
+                                                                deleteprojectmutation.mutate(project._id);
+                                                                setDeletingProjectId(null);
+                                                            }}
+                                                            className="text-xs font-semibold text-red-600 hover:underline"
+                                                            style={{ border: "none", background: "none", padding: 0, cursor: "pointer" }}
+                                                        >
+                                                            Yes
+                                                        </button>
+                                                        <span style={{ opacity: 0.3, fontSize: 11 }}>|</span>
+                                                        <button
+                                                            onClick={() => setDeletingProjectId(null)}
+                                                            className="text-xs font-medium text-gray-500 hover:underline"
+                                                            style={{ border: "none", background: "none", padding: 0, cursor: "pointer" }}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="project-actions" style={{ flexShrink: 0 }}>
+                                                        {/* Pencil — edit */}
+                                                        <button
+                                                            onClick={() => openEditProject(project)}
+                                                            title="Edit project"
+                                                            className="rounded-[6px] p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                        >
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                                            </svg>
+                                                        </button>
+                                                        {/* Trash — delete */}
+                                                        <button
+                                                            onClick={() => setDeletingProjectId(project._id)}
+                                                            title="Delete project"
+                                                            className="rounded-[6px] p-1.5 text-muted-foreground hover:bg-red-50 hover:text-red-500"
+                                                        >
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                <polyline points="3 6 5 6 21 6" />
+                                                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                                                <path d="M10 11v6M14 11v6" />
+                                                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </li>
                                     )
                                 })}
                             </ul>
                         )}
+                    </section>
+
+                    {/* ── VISITOR INSIGHTS ─────────────────────────────── */}
+                    <section
+                        ref={sectionRefs.analytics}
+                        className={`mt-10 border-t border-border pt-10 ${sectionClass("analytics")}`}
+                        style={{ animationDelay: "400ms" }}
+                        onClick={() => setActiveSection("analytics")}
+                    >
+                        <h2 className="text-[15px] font-medium">Visitor Insights</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            An analysis of your profile visitors based on user-agent detection.
+                        </p>
+
+                        <div className="analytics-grid mt-6 grid gap-6 md:grid-cols-3">
+                            {/* Browsers Card */}
+                            <div className="analytics-card">
+                                <h3 className="analytics-card-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline", marginRight: 6, verticalAlign: "middle" }}>
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="2" y1="12" x2="22" y2="12" />
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                                    </svg>
+                                    Browsers
+                                </h3>
+                                <div className="analytics-rows mt-4">
+                                    {statsData?.browserbreakdown && statsData.browserbreakdown.length > 0 ? (
+                                        statsData.browserbreakdown.map((b) => {
+                                            const total = statsData.browserbreakdown.reduce((sum, item) => sum + item.count, 0);
+                                            const percentage = total > 0 ? Math.round((b.count / total) * 100) : 0;
+                                            return (
+                                                <div key={b._id} className="analytics-row">
+                                                    <div className="analytics-row-info">
+                                                        <span className="analytics-name">{b._id || "Unknown"}</span>
+                                                        <span className="analytics-value">{b.count} ({percentage}%)</span>
+                                                    </div>
+                                                    <div className="analytics-progress-bg">
+                                                        <div className="analytics-progress-bar bg-browser" style={{ width: `${percentage}%` }} />
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <p className="text-xs text-muted-foreground">No browser data logged yet.</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Operating Systems Card */}
+                            <div className="analytics-card">
+                                <h3 className="analytics-card-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline", marginRight: 6, verticalAlign: "middle" }}>
+                                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                        <line x1="8" y1="21" x2="16" y2="21" />
+                                        <line x1="12" y1="17" x2="12" y2="21" />
+                                    </svg>
+                                    Operating Systems
+                                </h3>
+                                <div className="analytics-rows mt-4">
+                                    {statsData?.osbreakdown && statsData.osbreakdown.length > 0 ? (
+                                        statsData.osbreakdown.map((o) => {
+                                            const total = statsData.osbreakdown.reduce((sum, item) => sum + item.count, 0);
+                                            const percentage = total > 0 ? Math.round((o.count / total) * 100) : 0;
+                                            return (
+                                                <div key={o._id} className="analytics-row">
+                                                    <div className="analytics-row-info">
+                                                        <span className="analytics-name">{o._id || "Unknown"}</span>
+                                                        <span className="analytics-value">{o.count} ({percentage}%)</span>
+                                                    </div>
+                                                    <div className="analytics-progress-bg">
+                                                        <div className="analytics-progress-bar bg-os" style={{ width: `${percentage}%` }} />
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <p className="text-xs text-muted-foreground">No OS data logged yet.</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Device Types Card */}
+                            <div className="analytics-card">
+                                <h3 className="analytics-card-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline", marginRight: 6, verticalAlign: "middle" }}>
+                                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                                        <line x1="12" y1="18" x2="12.01" y2="18" />
+                                    </svg>
+                                    Devices
+                                </h3>
+                                <div className="analytics-rows mt-4">
+                                    {statsData?.devicebreakdown && statsData.devicebreakdown.length > 0 ? (
+                                        statsData.devicebreakdown.map((d) => {
+                                            const total = statsData.devicebreakdown.reduce((sum, item) => sum + item.count, 0);
+                                            const percentage = total > 0 ? Math.round((d.count / total) * 100) : 0;
+                                            return (
+                                                <div key={d._id} className="analytics-row">
+                                                    <div className="analytics-row-info">
+                                                        <span className="analytics-name" style={{ textTransform: "capitalize" }}>{d._id || "Desktop"}</span>
+                                                        <span className="analytics-value">{d.count} ({percentage}%)</span>
+                                                    </div>
+                                                    <div className="analytics-progress-bg">
+                                                        <div className="analytics-progress-bar bg-device" style={{ width: `${percentage}%` }} />
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <p className="text-xs text-muted-foreground">No device data logged yet.</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </section>
                 </main>
             </div>

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getskills, addskills, deleteskills } from "../api/skills";
+import { getskills, addskills, deleteskills, updateskills } from "../api/skills";
 
 export function useSkills(username) {
     return useQuery({
@@ -25,6 +25,16 @@ export function useDeleteSkill(username) {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: deleteskills,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["skills", username] });
+        },
+    });
+}
+
+export function useUpdateSkill(username) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }) => updateskills(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["skills", username] });
         },

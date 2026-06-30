@@ -1326,3 +1326,204 @@ body {
   }
 }
 
+/* ─────────────────────────────────────────────
+   DEVBOARD DASHBOARD UPGRADES & PREMIUM UI
+   ───────────────────────────────────────────── */
+
+/* Glassmorphism for dashboard header */
+header.sticky {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5) !important;
+}
+
+/* Sidebar navigation upgrades */
+.sidebar-nav-item {
+  transition: all 200ms ease;
+  padding: 8px 12px;
+}
+.sidebar-nav-item.active {
+  color: #000 !important;
+  font-weight: 500 !important;
+  background: none !important;
+}
+.sidebar-nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  background: #000;
+  border-radius: 2px;
+  display: block !important;
+}
+
+/* Stat card upgrades */
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.stat-card:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  transform: translateY(-2px);
+}
+.stat-number {
+  color: #0f172a;
+}
+.stat-label {
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Project card upgrades */
+.project-card {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.project-card:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  transform: translateY(-2px);
+}
+
+/* Active reaction button highlighting */
+.reaction-btn.active {
+  background: #f5f3ff;
+  border-color: #8b5cf6;
+}
+.reaction-btn.active .reaction-count {
+  color: #6d28d9;
+  font-weight: 600;
+}
+
+/* Analytics section layout */
+.analytics-card {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  transition: all 250ms ease;
+}
+.analytics-card:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+}
+.analytics-card-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.analytics-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.analytics-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.analytics-row-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #334155;
+}
+.analytics-name {
+  font-weight: 500;
+}
+.analytics-value {
+  color: #64748b;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.analytics-progress-bg {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+.analytics-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 1000ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bg-browser {
+  background: linear-gradient(90deg, #818cf8 0%, #6366f1 100%);
+}
+.bg-os {
+  background: linear-gradient(90deg, #38bdf8 0%, #0284c7 100%);
+}
+.bg-device {
+  background: linear-gradient(90deg, #f472b6 0%, #db2777 100%);
+}
+
+/* Skill pill hover & active transitions */
+.skill-pill {
+  transition: all 150ms ease;
+  cursor: default;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.skill-pill:hover {
+  background: #e4e4e7;
+}
+.skill-pill.featured:hover {
+  background: #18181b;
+}
+.skill-pill.deleting {
+  background: #fef2f2 !important;
+  color: #ef4444 !important;
+  border: 1px solid #fca5a5 !important;
+}
+.skill-actions {
+  opacity: 0;
+  transition: opacity 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+}
+.skill-pill:hover .skill-actions {
+  opacity: 1;
+}
+.skill-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  transition: color 100ms ease;
+}
+.skill-actions button:hover {
+  color: #000;
+}
+.skill-pill.featured .skill-actions button {
+  color: rgba(255, 255, 255, 0.6);
+}
+.skill-pill.featured .skill-actions button:hover {
+  color: #fff;
+}
+.skill-actions .skill-remove:hover {
+  color: #ef4444 !important;
+}
+
+
