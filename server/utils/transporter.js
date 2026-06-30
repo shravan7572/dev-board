@@ -1,20 +1,18 @@
 const nodemailer = require("nodemailer");
 
 if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.warn("\n=========================================================================");
-    console.warn("⚠️  [WARNING] EMAIL_USER or EMAIL_PASS environment variables are missing!");
-    console.warn("   Verification emails will fail to send.");
-    console.warn("   -> Please add EMAIL_USER and EMAIL_PASS to your environment variables");
-    console.warn("      in your Render Dashboard settings.");
-    console.warn("=========================================================================\n");
+    console.warn("⚠️  EMAIL_USER or EMAIL_PASS missing!");
 }
 
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,              // ← use 587 instead of default 465
+    secure: false,           // ← false for port 587 (uses STARTTLS)
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    }
+    },
+    family: 4                // ← forces IPv4, this is the key fix!
 });
 
 module.exports = transporter;
