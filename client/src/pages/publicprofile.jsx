@@ -127,6 +127,25 @@ function ReactionButton({ type, count, onClick, isPending, isActive }) {
     )
 }
 
+const CATEGORY_MAP = {
+    languages: ["languages", "language", "lang", "programming language"],
+    frontend: ["frontend", "front-end", "ui", "front end", "client"],
+    backend: ["backend", "back-end", "api", "back end", "server"],
+    database: ["database", "db", "databases", "sql", "nosql", "mongodb", "postgres", "sql server"],
+    deployment: ["deployment", "devops", "cloud", "deploy", "hosting", "ci/cd", "ci-cd"]
+};
+
+const getNormalizedCategory = (cat) => {
+    if (!cat) return "other";
+    const cleanCat = cat.trim().toLowerCase();
+    for (const [key, aliases] of Object.entries(CATEGORY_MAP)) {
+        if (aliases.includes(cleanCat) || cleanCat.includes(key)) {
+            return key;
+        }
+    }
+    return cleanCat;
+};
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 function PublicProfile() {
     const { username } = useParams()
@@ -136,6 +155,7 @@ function PublicProfile() {
     const [email, setEmail] = useState("")
     const [message, setMessage] = useState("")
     const [sent, setSent] = useState(false)
+    const [selectedCategory, setSelectedCategory] = useState("all")
 
     // ── data fetching ─────────────────────────────────────────────────────
     const { data: profileData, isLoading, isError: profileError } = useProflie(username)
@@ -194,6 +214,11 @@ function PublicProfile() {
     }
 
     const skills = skillsData?.data?.checkandgetallskills || []
+    const categoriesInSkills = ["all", ...new Set(skills.map(s => getNormalizedCategory(s.category)).filter(Boolean))];
+    const filteredSkills = selectedCategory === "all"
+        ? skills
+        : skills.filter(s => getNormalizedCategory(s.category) === selectedCategory);
+
     const projects = projectsData?.data?.projectdetailshow || []
     const reactions = reactionsData?.data?.counts || {}
     const github = githubData?.data || null
@@ -359,13 +384,57 @@ function PublicProfile() {
                 {/* ── SKILLS ─────────────────────────────────────────── */}
                 {(skillsLoading || skills.length > 0) && (
                     <section className="profile-section">
-                        <div className="profile-section-header">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                            </svg>
-                            <h2 className="profile-section-title">Skills</h2>
-                            <span className="profile-section-count">{skills.length}</span>
+                        <div className="profile-section-header" style={{ marginBottom: categoriesInSkills.length > 2 ? 12 : 24 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                                </svg>
+                                <h2 className="profile-section-title" style={{ margin: 0 }}>Skills</h2>
+                                <span className="profile-section-count">{skills.length}</span>
+                            </div>
                         </div>
+
+                        {/* Category filter tabs */}
+                        {!skillsLoading && categoriesInSkills.length > 2 && (
+                            <div className="skills-filter-tabs" style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
+                                {categoriesInSkills.map(cat => {
+                                    const label = cat === "all" ? "All" 
+                                                : cat === "languages" ? "Languages"
+                                                : cat === "frontend" ? "Frontend"
+                                                : cat === "backend" ? "Backend"
+                                                : cat === "database" ? "Database"
+                                                : cat === "deployment" ? "Deployment"
+                                                : cat.charAt(0).toUpperCase() + cat.slice(1);
+                                    const count = cat === "all" ? skills.length : skills.filter(s => getNormalizedCategory(s.category) === cat).length;
+                                    return (
+                                        <button
+                                            key={cat}
+                                            onClick={() => setSelectedCategory(cat)}
+                                            className={`skills-filter-tab${selectedCategory === cat ? " active" : ""}`}
+                                            style={{
+                                                fontSize: "11px",
+                                                padding: "4px 10px",
+                                                borderRadius: "999px",
+                                                border: "1px solid",
+                                                borderColor: selectedCategory === cat ? "#000" : "#e5e7eb",
+                                                background: selectedCategory === cat ? "#000" : "#fff",
+                                                color: selectedCategory === cat ? "#fff" : "#4b5563",
+                                                cursor: "pointer",
+                                                transition: "all 150ms ease",
+                                                fontWeight: selectedCategory === cat ? "600" : "500",
+                                                fontFamily: "var(--font-mono)",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "4px"
+                                            }}
+                                        >
+                                            <span>{label}</span>
+                                            <span style={{ fontSize: "9px", opacity: 0.6 }}>({count})</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
 
                         {skillsLoading ? (
                             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -375,7 +444,7 @@ function PublicProfile() {
                             </div>
                         ) : (
                             <div className="skills-grid">
-                                {skills.map(skill => (
+                                {filteredSkills.map(skill => (
                                     <span
                                         key={skill._id}
                                         className={`skill-chip${skill.featured ? " featured" : ""}`}

@@ -15,8 +15,11 @@ export const addproject = (data) =>
     })
 
 export const updatedproject = (id, data) =>
-    axios.put(`${BASE_URL}/api/project/update/${id}`, data, {  // ← add / before id!
-        headers: { token: getToken() }
+    axios.put(`${BASE_URL}/api/project/update/${id}`, data, {
+        headers: { 
+            token: getToken(),
+            "Content-Type": "multipart/form-data"
+        }
     })
 
 export const deleteproject = (id) =>

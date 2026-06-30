@@ -72,7 +72,7 @@ ProjectRoute.get("/project/:username", async function (req, res) {
     }
 });
 
-ProjectRoute.put("/project/update/:id", User_Auth, async function (req, res) {
+ProjectRoute.put("/project/update/:id", User_Auth, projectupload.single("thumbnail"), async function (req, res) {
     try {
         const checkid = await ProjectModel.findById(req.params.id);
 
@@ -89,7 +89,7 @@ ProjectRoute.put("/project/update/:id", User_Auth, async function (req, res) {
         }
 
         const updates = {};
-        const allowed = ["title", "description", "techstack", "liveurl", "githuburl", "thumbnail", "featured"];
+        const allowed = ["title", "description", "techstack", "liveurl", "githuburl", "featured"];
         for (const field of allowed) {
             if (req.body[field] !== undefined) {
                 updates[field] = field === "techstack"
@@ -98,6 +98,10 @@ ProjectRoute.put("/project/update/:id", User_Auth, async function (req, res) {
                         ? parseFeatured(req.body[field])
                         : req.body[field];
             }
+        }
+
+        if (req.file) {
+            updates.thumbnail = req.file.path || "";
         }
 
         const updatedprojectdetail = await ProjectModel.findByIdAndUpdate(

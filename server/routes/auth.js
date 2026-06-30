@@ -48,8 +48,8 @@ userroutes.post("/auth/signup", async function (req, res) {
             });
         }
 
-        const otp=generateOTP();
-        otpexpriry=Date.now()+10*60*1000;
+        const otp = generateOTP();
+        const otpexpiry = new Date(Date.now() + 10 * 60 * 1000);
 
         const hashedpassword = await bcrypt.hash(password, 9);
 
@@ -57,20 +57,20 @@ userroutes.post("/auth/signup", async function (req, res) {
             username,
             email,
             password: hashedpassword,
-            isVerified:false,
+            isVerified: false,
             otp,
-            otpexpriry
+            otpexpiry
         });
 
         await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Verify your DevBoard account",
-        html: `<h2>Your OTP is: ${otp}</h2><p>Expires in 10 minutes</p>`
-    })
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Verify your DevBoard account",
+            html: `<h2>Your OTP is: ${otp}</h2><p>Expires in 10 minutes</p>`
+        })
 
         res.status(201).json({
-            message:  "OTP send successsfully,PLease verify OTP",
+            message: "OTP sent successfully, please verify OTP",
         });
     } catch (e) {
         res.status(500).json({
@@ -80,32 +80,32 @@ userroutes.post("/auth/signup", async function (req, res) {
 });
 
 
-userroutes.post("/auth/otp-verify",async function(req,res){
-    const {email,otp}=req.body
+userroutes.post("/auth/otp-verify", async function (req, res) {
+    const { email, otp } = req.body
 
-    const user=await UserModel.findOne({email})
-    if(!user){
+    const user = await UserModel.findOne({ email })
+    if (!user) {
         return res.status(404).json({
-            message:"User not Found!"
+            message: "User not Found!"
         })
     }
 
-    if(user.otp!==otp){
+    if (user.otp !== otp) {
         return res.status(400).json({
-            message:"Invalid OTP"
+            message: "Invalid OTP"
         })
     }
 
-    if(Date.now()>user.otpexpiry){
+    if (user.otpexpiry && Date.now() > new Date(user.otpexpiry).getTime()) {
         return res.status(400).json({
-            message:"OTP expired."
+            message: "OTP expired."
         })
     }
-user.isVerified = true
+    user.isVerified = true
     user.otp = undefined
     user.otpexpiry = undefined
     await user.save()
-    res.json("message:otp verfied successfully")
+    res.json({ message: "OTP verified successfully" })
 
 })
 

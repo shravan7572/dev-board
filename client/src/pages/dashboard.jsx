@@ -105,6 +105,7 @@ function Dashboard() {
     const [skillYearsExp, setSkillYearsExp] = useState("")
     const [skillFeatured, setSkillFeatured] = useState(false)
     const [editingSkill, setEditingSkill] = useState(null)
+    const [showSkillModal, setShowSkillModal] = useState(false)
     const [deletingSkillId, setDeletingSkillId] = useState(null)
     const [deletingProjectId, setDeletingProjectId] = useState(null)
 
@@ -194,6 +195,16 @@ function Dashboard() {
         updateMutation.mutate({ bio, github, linkedin, twitter, githubUsername, theme })
     }
 
+    function openAddSkill() {
+        setEditingSkill(null)
+        setSkillname("")
+        setSkilllevel("")
+        setSkillcategory("")
+        setSkillYearsExp("")
+        setSkillFeatured(false)
+        setShowSkillModal(true)
+    }
+
     function openEditSkill(skill) {
         setEditingSkill(skill)
         setSkillname(skill.name || "")
@@ -201,9 +212,11 @@ function Dashboard() {
         setSkillcategory(skill.category || "")
         setSkillYearsExp(skill.yearsExp || "")
         setSkillFeatured(skill.featured || false)
+        setShowSkillModal(true)
     }
 
-    function cancelEditSkill() {
+    function closeSkillModal() {
+        setShowSkillModal(false)
         setEditingSkill(null)
         setSkillname("")
         setSkilllevel("")
@@ -212,7 +225,7 @@ function Dashboard() {
         setSkillFeatured(false)
     }
 
-    function handleAddSkill(e) {
+    function handleSaveSkill(e) {
         e?.preventDefault()
         if (editingSkill) {
             updateSkillMutation.mutate(
@@ -228,7 +241,7 @@ function Dashboard() {
                 },
                 {
                     onSuccess: () => {
-                        cancelEditSkill()
+                        closeSkillModal()
                     },
                 }
             )
@@ -243,11 +256,7 @@ function Dashboard() {
                 },
                 {
                     onSuccess: () => {
-                        setSkillname("")
-                        setSkilllevel("")
-                        setSkillcategory("")
-                        setSkillYearsExp("")
-                        setSkillFeatured(false)
+                        closeSkillModal()
                     },
                 }
             )
@@ -297,20 +306,21 @@ function Dashboard() {
         addprojectmutation.mutate(formData, { onSuccess: closeProjectModal })
     }
 
-    // Issue 5 fix: pass { id, data } so the hook can call updatedproject(id, data)
     function handleUpdateProject(e) {
         e?.preventDefault()
+        const formData = new FormData()
+        formData.append("title", title)
+        formData.append("description", desc)
+        formData.append("techstack", techstack)
+        formData.append("liveurl", liveurl)
+        formData.append("githuburl", githuburl)
+        formData.append("featured", projectFeatured)
+        if (thumbnail) formData.append("thumbnail", thumbnail)
+
         updateprojectmutation.mutate(
             {
                 id: editingProject._id,
-                data: {
-                    title,
-                    description: desc,
-                    techstack,
-                    liveurl,
-                    githuburl,
-                    featured: projectFeatured,
-                },
+                data: formData,
             },
             { onSuccess: closeProjectModal }
         )
@@ -577,91 +587,27 @@ function Dashboard() {
                         </form>
                     </section>
 
-                    {/* ── SKILLS (Issue 4) ─────────────────────────────── */}
+                    {/* ── SKILLS ─────────────────────────────────────────── */}
                     <section
                         ref={sectionRefs.skills}
                         className={`mt-10 border-t border-border pt-10 ${sectionClass("skills")}`}
                         style={{ animationDelay: "200ms" }}
                         onClick={() => setActiveSection("skills")}
                     >
-                        <h2 className="text-[15px] font-medium">Skills</h2>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Add the technologies you work with.
-                        </p>
-
-                        <form onSubmit={handleAddSkill} className="mt-6 grid max-w-2xl gap-4 sm:grid-cols-3">
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                             <div>
-                                <label className={labelClass}>Name</label>
-                                <input
-                                    className={inputClass}
-                                    placeholder="React"
-                                    value={skillname}
-                                    onChange={(e) => setSkillname(e.target.value)}
-                                    required
-                                />
+                                <h2 className="text-[15px] font-medium">Skills</h2>
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    Add the technologies you work with.
+                                </p>
                             </div>
-                            <div>
-                                <label className={labelClass}>Level</label>
-                                <input
-                                    className={inputClass}
-                                    placeholder="Beginner / Expert"
-                                    value={skilllevel}
-                                    onChange={(e) => setSkilllevel(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label className={labelClass}>Category</label>
-                                <input
-                                    className={inputClass}
-                                    placeholder="Frontend"
-                                    value={skillcategory}
-                                    onChange={(e) => setSkillcategory(e.target.value)}
-                                />
-                            </div>
-                            {/* Issue 4: yearsExp + featured */}
-                            <div>
-                                <label className={labelClass}>Years exp.</label>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    max="20"
-                                    className={inputClass}
-                                    placeholder="1–20"
-                                    value={skillYearsExp}
-                                    onChange={(e) => setSkillYearsExp(e.target.value)}
-                                />
-                            </div>
-                            <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: 4 }}>
-                                <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13 }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={skillFeatured}
-                                        onChange={(e) => setSkillFeatured(e.target.checked)}
-                                        style={{ width: 15, height: 15, cursor: "pointer" }}
-                                    />
-                                    Featured
-                                </label>
-                            </div>
-
-                            <div className="sm:col-span-3" style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                                <SaveButton
-                                    type="submit"
-                                    label={editingSkill ? "Save skill" : "Add skill"}
-                                    isPending={editingSkill ? updateSkillMutation.isPending : addskillmutation.isPending}
-                                    isSuccess={editingSkill ? updateSkillMutation.isSuccess : addskillmutation.isSuccess}
-                                    isError={editingSkill ? updateSkillMutation.isError : addskillmutation.isError}
-                                />
-                                {editingSkill && (
-                                    <button
-                                        type="button"
-                                        onClick={cancelEditSkill}
-                                        className="rounded-[6px] px-4 py-2 text-sm text-muted-foreground hover:bg-muted"
-                                    >
-                                        Cancel
-                                    </button>
-                                )}
-                            </div>
-                        </form>
+                            <button
+                                onClick={openAddSkill}
+                                className="rounded-[6px] border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted"
+                            >
+                                + Add skill
+                            </button>
+                        </div>
 
                         {skillsLoading && (
                             <p className="mt-4 text-sm text-muted-foreground">Loading skills…</p>
@@ -679,7 +625,7 @@ function Dashboard() {
                                 }
                                 title="No skills added yet."
                                 cta="Add your first skill →"
-                                onCta={() => document.querySelector("[placeholder='React']")?.focus()}
+                                onCta={openAddSkill}
                             />
                         )}
 
@@ -1120,6 +1066,114 @@ function Dashboard() {
                                 <div className="sm:col-span-2">
                                     <p className="text-xs text-red-500">
                                         {projectMutation.error?.response?.data?.message || "Failed to save project"}
+                                    </p>
+                                </div>
+                            )}
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* ── SKILL MODAL ─────────────────────────────────────────── */}
+            {showSkillModal && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+                    onClick={closeSkillModal}
+                >
+                    <div
+                        className="modal-animate w-full max-w-lg rounded-[8px] border border-border bg-background p-8 shadow-sm"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+                            <h2 className="text-[15px] font-medium">
+                                {editingSkill ? "Edit skill" : "Add skill"}
+                            </h2>
+                            <button
+                                onClick={closeSkillModal}
+                                className="rounded-[6px] p-1.5 text-muted-foreground hover:bg-muted"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <form
+                            onSubmit={handleSaveSkill}
+                            className="grid gap-4 sm:grid-cols-2"
+                        >
+                            <div>
+                                <label className={labelClass}>Name</label>
+                                <input
+                                    className={inputClass}
+                                    placeholder="React"
+                                    value={skillname}
+                                    onChange={(e) => setSkillname(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Level</label>
+                                <input
+                                    className={inputClass}
+                                    placeholder="Beginner / Expert"
+                                    value={skilllevel}
+                                    onChange={(e) => setSkilllevel(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Category</label>
+                                <input
+                                    className={inputClass}
+                                    placeholder="Frontend"
+                                    value={skillcategory}
+                                    onChange={(e) => setSkillcategory(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Years exp.</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="20"
+                                    className={inputClass}
+                                    placeholder="1–20"
+                                    value={skillYearsExp}
+                                    onChange={(e) => setSkillYearsExp(e.target.value)}
+                                />
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13 }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={skillFeatured}
+                                        onChange={(e) => setSkillFeatured(e.target.checked)}
+                                        style={{ width: 15, height: 15, cursor: "pointer" }}
+                                    />
+                                    Featured skill
+                                </label>
+                            </div>
+
+                            <div className="sm:col-span-2" style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 8 }}>
+                                <SaveButton
+                                    type="submit"
+                                    label={editingSkill ? "Save changes" : "Add skill"}
+                                    isPending={editingSkill ? updateSkillMutation.isPending : addskillmutation.isPending}
+                                    isSuccess={editingSkill ? updateSkillMutation.isSuccess : addskillmutation.isSuccess}
+                                    isError={editingSkill ? updateSkillMutation.isError : addskillmutation.isError}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={closeSkillModal}
+                                    className="rounded-[6px] px-4 py-2 text-sm text-muted-foreground hover:bg-muted"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                            {(editingSkill ? updateSkillMutation : addskillmutation).isError && (
+                                <div className="sm:col-span-2">
+                                    <p className="text-xs text-red-500">
+                                        {(editingSkill ? updateSkillMutation : addskillmutation).error?.response?.data?.message || "Failed to save skill"}
                                     </p>
                                 </div>
                             )}
