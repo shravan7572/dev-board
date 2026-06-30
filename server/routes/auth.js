@@ -80,6 +80,9 @@ userroutes.post("/auth/signup", async function (req, res) {
             console.error("Verification email sending failed:", err);
         });
 
+        // Log OTP to server console for testing/logs visibility
+        console.log(`[OTP SENT] User: ${username} | Email: ${email} | OTP Code: ${otp}`);
+
         res.status(201).json({
             message: "OTP sent successfully, please verify OTP",
         });
@@ -153,6 +156,9 @@ userroutes.post("/auth/resend-otp", async function (req, res) {
         }).catch(err => {
             console.error("Resend OTP email sending failed:", err)
         })
+
+        // Log OTP to server console for testing/logs visibility
+        console.log(`[OTP RESENT] Email: ${email} | OTP Code: ${otp}`);
 
         res.json({ message: "OTP resent successfully" })
     } catch (e) {
