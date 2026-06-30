@@ -2,12 +2,18 @@ const express = require("express");
 const { UserModel } = require("../models/user");
 const { z } = require("zod");
 const bcrypt = require("bcrypt");
+const nodemailer=require("nodemailer")
+const transporter=require("../utils/transporter")
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 const userroutes = express.Router();
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
+
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString()
+}
 userroutes.post("/auth/signup", async function (req, res) {
     try {
         const userzod = z.object({
@@ -42,23 +48,66 @@ userroutes.post("/auth/signup", async function (req, res) {
             });
         }
 
+        const otp=generateOTP();
+        otpexpriry=Date.now()+10*60*1000;
+
         const hashedpassword = await bcrypt.hash(password, 9);
 
         await UserModel.create({
             username,
             email,
             password: hashedpassword,
+            isVerified:false,
+            otp,
+            otpexpriry
         });
 
+        await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Verify your DevBoard account",
+        html: `<h2>Your OTP is: ${otp}</h2><p>Expires in 10 minutes</p>`
+    })
+
         res.status(201).json({
-            message: "Sign-up successful",
+            message:  "OTP send successsfully,PLease verify OTP",
         });
     } catch (e) {
         res.status(500).json({
-            message: "Something went wrong",
+            message: e.message,
         });
     }
 });
+
+
+userroutes.post("/auth/otp-verify",async function(req,res){
+    const {email,otp}=req.body
+
+    const user=await UserModel.findOne({email})
+    if(!user){
+        return res.status(404).json({
+            message:"User not Found!"
+        })
+    }
+
+    if(user.otp!==otp){
+        return res.status(400).json({
+            message:"Invalid OTP"
+        })
+    }
+
+    if(Date.now()>user.otpexpiry){
+        return res.status(400).json({
+            message:"OTP expired."
+        })
+    }
+user.isVerified = true
+    user.otp = undefined
+    user.otpexpiry = undefined
+    await user.save()
+    res.json("message:otp verfied successfully")
+
+})
 
 userroutes.post("/auth/login", async function (req, res) {
     try {
@@ -75,6 +124,11 @@ userroutes.post("/auth/login", async function (req, res) {
                 message: "User does not exist",
             });
         }
+
+
+    if(!userlogin.isVerified) {
+        return res.status(403).json({ message: "Please verify your email first" })
+    }
 
         const comparepassword = await bcrypt.compare(password, userlogin.password);
 
