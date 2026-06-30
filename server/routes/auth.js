@@ -62,12 +62,15 @@ userroutes.post("/auth/signup", async function (req, res) {
             otpexpiry
         });
 
-        await transporter.sendMail({
+        // Send verification email in the background without blocking the response
+        transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Verify your DevBoard account",
             html: `<h2>Your OTP is: ${otp}</h2><p>Expires in 10 minutes</p>`
-        })
+        }).catch(err => {
+            console.error("Verification email sending failed:", err);
+        });
 
         res.status(201).json({
             message: "OTP sent successfully, please verify OTP",
