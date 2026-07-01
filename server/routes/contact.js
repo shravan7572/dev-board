@@ -23,7 +23,8 @@ ContactRoute.post("/:username", async function (req, res) {
             });
         }
 
-        await transporter.sendMail({
+        // Send notifications in the background so the HTTP request completes instantly
+        transporter.sendMail({
             from: process.env.EMAIL_USER,
             replyTo: email,
             to: user.email,
@@ -36,9 +37,11 @@ ContactRoute.post("/:username", async function (req, res) {
             <p><strong>Message:</strong></p>
             <p>${message}</p>
           `,
+        }).catch(err => {
+            console.error("Failed to send contact email to profile owner:", err);
         });
 
-        await transporter.sendMail({
+        transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
             subject: `Thanks for contacting ${username}`,
@@ -50,6 +53,8 @@ ContactRoute.post("/:username", async function (req, res) {
         <p><strong>Your message:</strong></p>
         <p>${message}</p>
       `,
+        }).catch(err => {
+            console.error("Failed to send receipt email to contact sender:", err);
         });
 
         return res.status(200).json({
