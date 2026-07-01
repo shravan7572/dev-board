@@ -7,4 +7,8 @@ export const signup = (data) =>
 export const login = (data) =>{
      return axios.post(`${BASE_URL}/api/auth/login`, data)
 }
+export const verifyOtp = (data) =>
+   axios.post(`${BASE_URL}/api/auth/otp-verify`, data)
+export const resendOtp = (data) =>
+   axios.post(`${BASE_URL}/api/auth/resend-otp`, data)
 

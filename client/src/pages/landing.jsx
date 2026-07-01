@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useMutation } from "@tanstack/react-query"
-import { login, signup } from "../api/auth"
+import { login, signup, verifyOtp, resendOtp } from "../api/auth"
 import "./landing.css"
 import LandingNav from "../components/landing/LandingNav"
 import Hero from "../components/landing/Hero"
@@ -33,17 +33,42 @@ function Landing() {
     onError: (err) => {
       const errMsg = err.response?.data?.message || "login failed";
       seterror(errMsg)
+      if (err.response?.status === 403) {
+        setshowModal("otp-verify")
+      }
     },
   })
 
   const signuomutation = useMutation({
     mutationFn: signup,
     onSuccess: () => {
-      setshowModal("login")
-      seterror("Account created successfully! Please log in.")
+      setshowModal("otp-verify")
+      seterror("")
     },
     onError: (err) => {
       seterror(err.response?.data?.message || "signup failed")
+    },
+  })
+
+  const otpverifyhydration = useMutation({
+    mutationFn: verifyOtp,
+    onSuccess: () => {
+      setshowModal("login")
+      seterror("Email verified successfully! Please log in.")
+      setotp("")
+    },
+    onError: (err) => {
+      seterror(err.response?.data?.message || "Verification failed")
+    },
+  })
+
+  const resendotpmutation = useMutation({
+    mutationFn: resendOtp,
+    onSuccess: () => {
+      seterror("A new OTP has been sent to your email.")
+    },
+    onError: (err) => {
+      seterror(err.response?.data?.message || "Failed to resend OTP")
     },
   })
 
@@ -53,6 +78,10 @@ function Landing() {
 
   function handlelogin() {
     loginmutation.mutate({ email, password })
+  }
+
+  function handleVerifyOtp() {
+    otpverifyhydration.mutate({ email, otp })
   }
 
   function openModal(type) {
@@ -67,6 +96,7 @@ function Landing() {
   function closeModal() {
     setshowModal(null)
     seterror("")
+    setotp("")
   }
 
   return (
@@ -108,48 +138,86 @@ function Landing() {
             <div className="mb-6 text-center">
               <div className="font-mono text-[15px] font-medium text-black">devboard</div>
               <h2 className="mt-2 text-[18px] font-medium text-black">
-                {showModal === "signup" ? "Create your account" : "Welcome back"}
+                {showModal === "signup" ? "Create your account" : showModal === "otp-verify" ? "Verify your email" : "Welcome back"}
               </h2>
             </div>
 
             <div className="flex flex-col gap-3">
-              {showModal === "signup" && (
-                <input
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setusername(e.target.value)}
-                  className="h-9 w-full rounded-[6px] border border-gray-200 px-3 text-[14px] text-black placeholder:text-gray-400 focus:border-black focus:outline-none"
-                />
+              {showModal === "otp-verify" ? (
+                <>
+                  <p className="text-center text-[13px] text-gray-500">
+                    We sent a verification code to <strong>{email}</strong>.
+                  </p>
+                  <input
+                    placeholder="6-digit OTP"
+                    value={otp}
+                    onChange={(e) => setotp(e.target.value)}
+                    maxLength={6}
+                    className="h-10 w-full rounded-[6px] border border-gray-200 px-3 text-center font-mono text-[16px] tracking-[0.25em] text-black placeholder:text-gray-400 focus:border-black focus:outline-none"
+                  />
+
+                  {error && <p className="text-[13px] text-red-500">{error}</p>}
+
+                  <button
+                    onClick={handleVerifyOtp}
+                    disabled={otpverifyhydration.isPending}
+                    className="mt-1 h-9 w-full rounded-[6px] bg-black text-[14px] font-medium text-white transition-colors duration-150 hover:bg-gray-800 disabled:opacity-60"
+                  >
+                    {otpverifyhydration.isPending ? "Verifying..." : "Verify OTP"}
+                  </button>
+
+                  <div className="mt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => resendotpmutation.mutate({ email })}
+                      disabled={resendotpmutation.isPending}
+                      className="text-[12px] font-medium text-gray-500 hover:text-black disabled:opacity-50 hover:underline"
+                    >
+                      {resendotpmutation.isPending ? "Resending code..." : "Resend code"}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {showModal === "signup" && (
+                    <input
+                      placeholder="Username"
+                      value={username}
+                      onChange={(e) => setusername(e.target.value)}
+                      className="h-9 w-full rounded-[6px] border border-gray-200 px-3 text-[14px] text-black placeholder:text-gray-400 focus:border-black focus:outline-none"
+                    />
+                  )}
+                  <input
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setemail(e.target.value)}
+                    className="h-9 w-full rounded-[6px] border border-gray-200 px-3 text-[14px] text-black placeholder:text-gray-400 focus:border-black focus:outline-none"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setpassword(e.target.value)}
+                    className="h-9 w-full rounded-[6px] border border-gray-200 px-3 text-[14px] text-black placeholder:text-gray-400 focus:border-black focus:outline-none"
+                  />
+
+                  {error && <p className="text-[13px] text-red-500">{error}</p>}
+
+                  <button
+                    onClick={showModal === "signup" ? handlesignup : handlelogin}
+                    disabled={signuomutation.isPending || loginmutation.isPending}
+                    className="mt-1 h-9 w-full rounded-[6px] bg-black text-[14px] font-medium text-white transition-colors duration-150 hover:bg-gray-800 disabled:opacity-60"
+                  >
+                    {showModal === "signup"
+                      ? signuomutation.isPending
+                        ? "Creating account..."
+                        : "Create account"
+                      : loginmutation.isPending
+                        ? "Signing in..."
+                        : "Log in"}
+                  </button>
+                </>
               )}
-              <input
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setemail(e.target.value)}
-                className="h-9 w-full rounded-[6px] border border-gray-200 px-3 text-[14px] text-black placeholder:text-gray-400 focus:border-black focus:outline-none"
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setpassword(e.target.value)}
-                className="h-9 w-full rounded-[6px] border border-gray-200 px-3 text-[14px] text-black placeholder:text-gray-400 focus:border-black focus:outline-none"
-              />
-
-              {error && <p className="text-[13px] text-red-500">{error}</p>}
-
-              <button
-                onClick={showModal === "signup" ? handlesignup : handlelogin}
-                disabled={signuomutation.isPending || loginmutation.isPending}
-                className="mt-1 h-9 w-full rounded-[6px] bg-black text-[14px] font-medium text-white transition-colors duration-150 hover:bg-gray-800 disabled:opacity-60"
-              >
-                {showModal === "signup"
-                  ? signuomutation.isPending
-                    ? "Creating account..."
-                    : "Create account"
-                  : loginmutation.isPending
-                    ? "Signing in..."
-                    : "Log in"}
-              </button>
             </div>
 
             <p className="mt-5 text-center text-[13px] text-gray-500">
@@ -161,6 +229,16 @@ function Landing() {
                     className="font-medium text-black hover:underline"
                   >
                     Log in
+                  </button>
+                </>
+              ) : showModal === "otp-verify" ? (
+                <>
+                  Back to{" "}
+                  <button
+                    onClick={() => openModal("signup")}
+                    className="font-medium text-black hover:underline"
+                  >
+                    Sign up
                   </button>
                 </>
               ) : (

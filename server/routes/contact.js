@@ -1,5 +1,5 @@
 const express = require("express");
-const transporter = require("../utils/transporter");
+const { sendEmail } = require("../utils/transporter");
 const { UserModel } = require("../models/user");
 
 const ContactRoute = express.Router();
@@ -24,8 +24,7 @@ ContactRoute.post("/:username", async function (req, res) {
         }
 
         // Send notifications in the background so the HTTP request completes instantly
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
+        sendEmail({
             replyTo: email,
             to: user.email,
             subject: `New message from ${name}`,
@@ -41,8 +40,7 @@ ContactRoute.post("/:username", async function (req, res) {
             console.error("Failed to send contact email to profile owner:", err);
         });
 
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
+        sendEmail({
             to: email,
             subject: `Thanks for contacting ${username}`,
             html: `

@@ -2,8 +2,7 @@ const express = require("express");
 const { UserModel } = require("../models/user");
 const { z } = require("zod");
 const bcrypt = require("bcrypt");
-const nodemailer=require("nodemailer")
-const transporter=require("../utils/transporter")
+const { sendEmail } = require("../utils/transporter");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 const userroutes = express.Router();
@@ -42,23 +41,48 @@ userroutes.post("/auth/signup", async function (req, res) {
 
         const userexistornot = await UserModel.findOne({ email });
 
+        const otp = generateOTP();
+        const otpexpiry = new Date(Date.now() + 10 * 60 * 1000);
+        const hashedpassword = await bcrypt.hash(password, 9);
+
         if (userexistornot) {
-            return res.status(400).json({
-                message: "Email already exists",
+            if (userexistornot.isVerified) {
+                return res.status(400).json({
+                    message: "Email already exists",
+                });
+            } else {
+                // Update existing unverified user record with new signup details
+                userexistornot.username = username;
+                userexistornot.password = hashedpassword;
+                userexistornot.otp = otp;
+                userexistornot.otpexpiry = otpexpiry;
+                await userexistornot.save();
+            }
+        } else {
+            await UserModel.create({
+                username,
+                email,
+                password: hashedpassword,
+                isVerified: false,
+                otp,
+                otpexpiry
             });
         }
 
-        const hashedpassword = await bcrypt.hash(password, 9);
-
-        await UserModel.create({
-            username,
-            email,
-            password: hashedpassword,
-            isVerified: true // Set to true directly to bypass OTP validation
+        // Send verification email in the background via Brevo HTTP API
+        sendEmail({
+            to: email,
+            subject: "Verify your DevBoard account",
+            html: `<h2>Your OTP is: ${otp}</h2><p>Expires in 10 minutes</p>`
+        }).catch(err => {
+            console.error("Verification email sending failed:", err);
         });
 
+        // Log OTP to server console for testing/logs visibility
+        console.log(`[OTP SENT] User: ${username} | Email: ${email} | OTP Code: ${otp}`);
+
         res.status(201).json({
-            message: "Account created successfully",
+            message: "OTP sent successfully, please verify OTP",
         });
     } catch (e) {
         res.status(500).json({
@@ -67,7 +91,6 @@ userroutes.post("/auth/signup", async function (req, res) {
     }
 });
 
-/* Commented out OTP verification & resend endpoints since OTP is disabled
 userroutes.post("/auth/otp-verify", async function (req, res) {
     const { email, otp } = req.body
 
@@ -121,13 +144,23 @@ userroutes.post("/auth/resend-otp", async function (req, res) {
         user.otpexpiry = otpexpiry
         await user.save()
 
-        // Send new OTP email in background
+        // Send new OTP email in background via Brevo HTTP API
+        sendEmail({
+            to: email,
+            subject: "Verify your DevBoard account - Resend OTP",
+            html: `<h2>Your OTP is: ${otp}</h2><p>Expires in 10 minutes</p>`
+        }).catch(err => {
+            console.error("Resend OTP email sending failed:", err)
+        })
+
+        // Log OTP to server console for testing/logs visibility
+        console.log(`[OTP RESENT] Email: ${email} | OTP Code: ${otp}`);
+
         res.json({ message: "OTP resent successfully" })
     } catch (e) {
         res.status(500).json({ message: e.message })
     }
 })
-*/
 
 userroutes.post("/auth/login", async function (req, res) {
     try {
@@ -143,6 +176,10 @@ userroutes.post("/auth/login", async function (req, res) {
             return res.status(404).json({
                 message: "User does not exist",
             });
+        }
+
+        if (!userlogin.isVerified) {
+            return res.status(403).json({ message: "Please verify your email first" })
         }
 
         const comparepassword = await bcrypt.compare(password, userlogin.password);
