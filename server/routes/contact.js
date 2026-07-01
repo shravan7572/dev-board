@@ -48,7 +48,7 @@ ContactRoute.post("/:username", async function (req, res) {
         <p>${username} has received your message and will reply soon.</p>
         <br/>
         <p><strong>Your message:</strong></p>
-        <p></p>
+        <p>${message}</p>
       `,
         });
 

@@ -16,13 +16,8 @@ app.set("trust proxy", 1);
 app.use(express.json());
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
-        const normalized = origin.replace(/\/$/, "");
-        if (allowedOrigins.includes(normalized) || normalized.endsWith(".vercel.app") || normalized.includes("localhost")) {
-            callback(null, true);
-        } else {
-            callback(new Error(`Origin ${origin} not allowed by CORS`));
-        }
+        // Allow all origins dynamically to prevent any deployment CORS issues on custom domains/Vercel
+        callback(null, true);
     },
     credentials: true,
 }));
