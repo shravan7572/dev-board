@@ -10,7 +10,7 @@ function LandingFooter() {
     "Preview":   () => document.getElementById("preview")?.scrollIntoView({ behavior: "smooth" }),
     "GitHub":    () => window.open("https://github.com/shravan7572/dev-board", "_blank"),
     "Twitter":   () => window.open("https://twitter.com/Shravann3107", "_blank"),
-    "Contact":   () => navigate("/shraventest"),
+    "Contact":   () => navigate("/shravan"),
   }
 
   return (
