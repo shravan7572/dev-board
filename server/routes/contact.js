@@ -48,8 +48,7 @@ ContactRoute.post("/:username", async function (req, res) {
         <p>Hi ${name},</p>
         <p>${username} has received your message and will reply soon.</p>
         <br/>
-        <p><strong>Your message:</strong></p>
-        <p>${message}</p>
+        
       `,
         }).catch(err => {
             console.error("Failed to send receipt email to contact sender:", err);
