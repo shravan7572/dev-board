@@ -11,7 +11,7 @@
 Most developers have their work scattered across LinkedIn, GitHub, and static portfolio sites. DevBoard brings everything together into one living, breathing profile that updates as you build.
 
 ```
-devboard.app/shravan
+dev-boardapp.vercel.app/shravan
 ```
 
 One link. Everything a recruiter or collaborator needs to know about you.
@@ -21,7 +21,7 @@ One link. Everything a recruiter or collaborator needs to know about you.
 ## Features
 
 ### Core
-- **Public Profile URL** — Every developer gets a unique `devboard.app/username` link
+- **Public Profile URL** — Every developer gets a unique `dev-boardapp.vercel.app/username` link
 - **Skills Showcase** — Add skills with proficiency levels (Beginner / Intermediate / Expert) and categories (Frontend / Backend / DevOps / Database)
 - **Project Portfolio** — Showcase projects with thumbnails, tech stack, live links, and GitHub links
 - **GitHub Integration** — Contribution graph and top repositories pulled live from GitHub's public API
@@ -180,7 +180,7 @@ VITE_BASE_URL=http://localhost:5001
 Final year BSc Computer Science — Pune
 
 - DevBoard → [dev-boardapp.vercel.app/shravan](https://dev-boardapp.vercel.app/shravan)
-- GitHub → [github.com/shravan7572](https://github.com/shravan7572)
+- GitHub → [github.com/shravan7572](https://github.com/shravan7572/dev-board)
 
 ---
 
