@@ -180,7 +180,7 @@ VITE_BASE_URL=http://localhost:5001
 Final year BSc Computer Science — Pune
 
 - DevBoard → [dev-boardapp.vercel.app/shravan](https://dev-boardapp.vercel.app/shravan)
-- GitHub → [github.com/shravan7572](https://github.com/shravan7572/dev-board)
+- GitHub → [github.com/shravan7572](https://github.com/shravan7572)
 
 ---
 

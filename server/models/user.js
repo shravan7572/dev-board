@@ -17,6 +17,6 @@ const UserSchema = new Schema({
     theme: { type: String, default: "purple" },
 });
 
-const UserModel = mongoose.model("Userdata", UserSchema);
 
-module.exports = { UserModel };
+const UserModel = mongoose.model("Userdata", UserSchema);
+module.exports = { UserModel};

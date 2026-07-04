@@ -194,7 +194,7 @@ function Landing() {
                     className="h-9 w-full rounded-[6px] border border-gray-200 px-3 text-[14px] text-black placeholder:text-gray-400 focus:border-black focus:outline-none"
                   />
                   <input
-                    type="password"
+                  type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setpassword(e.target.value)}
