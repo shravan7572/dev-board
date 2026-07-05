@@ -50,7 +50,7 @@ userroutes.post("/auth/signup", async function (req, res) {
         if (usernameInUsers) {
             return res.status(409).json({ message: "Username already taken" });
         }
-
+//security thats it 
         await TemoOtpModel.deleteMany({
             $or: [
                 { email },
