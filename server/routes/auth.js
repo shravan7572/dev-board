@@ -37,7 +37,9 @@ userroutes.post("/auth/signup", async function (req, res) {
                 message: parsezoduser.error.issues[0].message,
             });
         }
-        const { username, email, password } = req.body;
+        const username = req.body.username.trim().toLowerCase();
+        const email = req.body.email.trim().toLowerCase();
+        const password = req.body.password;
 
         const [emailInUsers, usernameInUsers] = await Promise.all([
             UserModel.findOne({ email }),
@@ -50,7 +52,7 @@ userroutes.post("/auth/signup", async function (req, res) {
         if (usernameInUsers) {
             return res.status(409).json({ message: "Username already taken" });
         }
-//security thats it 
+        //security thats it 
         await TemoOtpModel.deleteMany({
             $or: [
                 { email },
@@ -58,12 +60,12 @@ userroutes.post("/auth/signup", async function (req, res) {
             ]
         });
 
-    
+
         const otp = generateOTP();
         const otpexpiry = new Date(Date.now() + 10 * 60 * 1000);
         const hashedpassword = await bcrypt.hash(password, 9);
 
-        
+
         await TemoOtpModel.create({
             username,
             email,
@@ -72,7 +74,7 @@ userroutes.post("/auth/signup", async function (req, res) {
             otpexpiry
         });
 
-        
+
         sendEmail({
             to: email,
             subject: "Verify your DevBoard account",
@@ -96,7 +98,7 @@ userroutes.post("/auth/signup", async function (req, res) {
 
 userroutes.post("/auth/otp-verify", async function (req, res) {
     try {
-      
+
         const { email, otp } = req.body
 
         const user = await TemoOtpModel.findOne({ email })
@@ -166,7 +168,7 @@ userroutes.post("/auth/resend-otp", async function (req, res) {
             console.error("Resend OTP email sending failed:", err)
         })
 
-      
+
         res.json({ message: "OTP resent successfully" })
     } catch (e) {
         res.status(500).json({ message: e.message })
@@ -214,6 +216,24 @@ userroutes.post("/auth/login", async function (req, res) {
         });
     } catch (e) {
         res.status(500).json({ message: "Something went wrong" });
+    }
+});
+
+userroutes.get("/auth/check-username/:username", async (req, res) => {
+    try {
+        const username = req.params.username.trim().toLowerCase();
+
+        const existingUser = await UserModel.findOne({
+            username: new RegExp(`^${username}$`, "i")
+        });
+
+        res.json({
+            available: !existingUser
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "Something went wrong"
+        });
     }
 });
 

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import heroBg from "../../assets/devboard_hero_bg.jpg"
 
-const TAKEN = ["vercel", "github", "admin", "dan", "lee", "sarah"]
 
 // Floating glassmorphic card preview
 function FloatingCard() {
@@ -98,10 +97,37 @@ function FloatingCard() {
 }
 
 function Hero({ claimName, setClaimName, onClaim }) {
-  const clean = (claimName || "").trim().toLowerCase()
-  const taken = clean.length > 0 && TAKEN.includes(clean)
-  const available = clean.length > 0 && !taken
+  const [available, setAvailable] = useState(null);
+  const [checking, setChecking] = useState(false);
+  const clean = (claimName || "").trim().toLowerCase();
+  const taken = available === false;
+  useEffect(() => {
+    if (!clean) {
+      setAvailable(null);
+      return;
+    }
 
+    const timer = setTimeout(async () => {
+      try {
+        setChecking(true);
+
+        const response = await fetch(
+          `http://localhost:5001/api/auth/check-username/${clean}`
+        );
+
+        const data = await response.json();
+
+        setAvailable(data.available);
+      } catch (err) {
+        console.error(err);
+        setAvailable(null);
+      } finally {
+        setChecking(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [clean]);
   return (
     <section className="hero-section-new" >
       {/* Set generated image as background on the right, blended nicely */}
@@ -130,15 +156,25 @@ function Hero({ claimName, setClaimName, onClaim }) {
             Projects, GitHub activity, skills, and contact — all on a single
             beautiful profile built for developers who ship.
           </p>
-    
+
           {/* Beautiful Embedded URL Claimer Capsule */}
           <div className="hero-claimer-wrap">
-            
+
             <div className={`hero-claimer-input-box ${available ? "available" : taken ? "taken" : ""}`}>
               <span className="hero-claimer-prefix">devboard.app/</span>
+
+              {/* changes to be done here !!!!!!!!!!!!! */}
+              {/* changes to be done here !!!!!!!!!!!!! */}
+              {/* changes to be done here !!!!!!!!!!!!! */}
+              {/* changes to be done here !!!!!!!!!!!!! */}
+              {/* changes to be done here !!!!!!!!!!!!! */}
               <input
                 value={claimName || ""}
-                onChange={(e) => setClaimName(e.target.value.replace(/\s/g, ""))}
+                onChange={(e) =>
+                  setClaimName(
+                    e.target.value.replace(/\s/g, "").toLowerCase()
+                  )
+                }
                 placeholder="yourname"
                 className="hero-claimer-input"
                 aria-label="Claim your devboard handle"
@@ -147,24 +183,30 @@ function Hero({ claimName, setClaimName, onClaim }) {
               />
               <button
                 onClick={onClaim}
-                disabled={taken || clean.length === 0}
+               disabled={clean.length === 0 || checking || available !== true}F
                 className="hero-claimer-btn"
               >
                 Claim URL →
               </button>
             </div>
 
-            {clean.length > 0 && (
-              <p className={`hero-claimer-status ${taken ? "taken" : "free"}`}>
-                {taken
-                  ? `✕ devboard.app/${clean} is taken`
-                  : `✓ devboard.app/${clean} is available — grab it now!`}
-              </p>
-            )}
+           {clean.length > 0 && (
+  <p
+    className={`hero-claimer-status ${
+      checking ? "" : taken ? "taken" : "free"
+    }`}
+  >
+    {checking
+      ? "Checking..."
+      : taken
+      ? `✕ devboard.app/${clean} is taken`
+      : `✓ devboard.app/${clean} is available — grab it now!`}
+  </p>
+)}
           </div>
 
 
-    
+
         </div>
 
         {/* Right Side: Floating Mock Profile */}
