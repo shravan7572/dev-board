@@ -4,20 +4,20 @@ const TABS = ["Projects", "Skills", "Activity"]
 
 const CONTENT = {
   Projects: [
-    { title: "devboard", desc: "Public developer profiles, open source", meta: "TypeScript · 1.2k ★" },
-    { title: "edge-cache", desc: "Tiny LRU cache for the edge runtime", meta: "Rust · 340 ★" },
-    { title: "mdx-notes", desc: "Local-first markdown note taking", meta: "TypeScript · 88 ★" },
+    { title: "devboard", desc: "Public developer profiles, open source", meta: "TypeScript · 1 ★" },
+    { title: "plugr", desc: "A package for already exist express projext ", meta: "TypeScript · 2 ★" },
+    { title: "snap-url", desc: "Short URLs with analytics built in.", meta: "JavaScript · 2 ★" },
   ],
   Skills: [
-    { title: "TypeScript", desc: "Daily driver, 5 years", meta: "expert" },
-    { title: "Go", desc: "Backend services and CLIs", meta: "proficient" },
+    { title: "TypeScript", desc: "Daily driver, 0.5 years", meta: "learning" },
+    { title: "JavaScript", desc: "Backend services and CLIs", meta: "proficient" },
     { title: "PostgreSQL", desc: "Schema design, query tuning", meta: "proficient" },
-    { title: "Rust", desc: "Systems and WASM targets", meta: "learning" },
+    { title: "React", desc: "Frontend design", meta: "learning" },
   ],
   Activity: [
-    { title: "Pushed to devboard", desc: "feat: live URL availability check", meta: "2 hrs ago" },
-    { title: "Opened PR in edge-cache", desc: "perf: reduce allocations on read", meta: "yesterday" },
-    { title: "Starred react-aria", desc: "Accessible UI primitives", meta: "3 days ago" },
+    { title: "Pushed to devboard", desc: "feat: live URL availability check"  },
+    { title: "Opened PR in edge-cache", desc: "perf: reduce allocations on read" },
+    { title: "Starred Chat-app", desc: "Accessible for everyone",  },
   ],
 }
 
