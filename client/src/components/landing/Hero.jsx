@@ -120,7 +120,7 @@ function Hero({ claimName, setClaimName, onClaim }) {
         setAvailable(data.available);
       } catch (err) {
         console.error(err);
-        setAvailable(null);
+        setAvailable(null); 
       } finally {
         setChecking(false);
       }
@@ -183,7 +183,7 @@ function Hero({ claimName, setClaimName, onClaim }) {
               />
               <button
                 onClick={onClaim}
-               disabled={clean.length === 0 || checking || available !== true}F
+               disabled={clean.length === 0 || checking || available !== true}
                 className="hero-claimer-btn"
               >
                 Claim URL →
