@@ -5,7 +5,7 @@ async function sendEmail({ to, replyTo, subject, html }) {
     const email_user = process.env.EMAIL_USER || "shravan.mac31@gmail.com";
 
     if (!api_key) {
-        console.warn("⚠️ [WARNING] BERVO_API_KEY environment variable is missing!");
+        console.warn("[WARNING] BERVO_API_KEY environment variable is missing!");
         return;
     }
 
@@ -39,7 +39,7 @@ async function sendEmail({ to, replyTo, subject, html }) {
         });
         return response.data;
     } catch (err) {
-        console.error("❌ Brevo API sendEmail error:", err.response?.data || err.message);
+        console.error("Brevo API sendEmail error:", err.response?.data || err.message);
         throw err;
     }
 }

@@ -1,15 +1,15 @@
 import axios from "axios"
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
-const getToken = () => localStorage.getItem("token")  // ← fix capital T
+const getToken = () => localStorage.getItem("token")  
 
 export const getproject = (username) =>
-    axios.get(`${BASE_URL}/api/project/${username}`)  // ← matches backend ✅
+    axios.get(`${BASE_URL}/api/project/${username}`)  
 
 export const addproject = (data) =>
     axios.post(`${BASE_URL}/api/project`, data, {
         headers: { 
-            token: getToken(),  // ← fixed!
+            token: getToken(),  
             "Content-Type": "multipart/form-data"
         }
     })

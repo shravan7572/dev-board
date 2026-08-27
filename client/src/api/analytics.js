@@ -9,4 +9,4 @@ export const trackView = (username) =>
 export const getStats = () =>
     axios.get(`${BASE_URL}/api/view/stats`, {
         headers: { token: getToken() }
-    })
+ })
