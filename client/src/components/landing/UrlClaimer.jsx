@@ -9,7 +9,6 @@ function UrlClaimer({ name, setName, onClaim }) {
   const display = clean || "yourname";
 
   useEffect(() => {
-    // Nothing to check
     if (!clean) {
       setAvailable(null);
       setChecking(false);
@@ -72,13 +71,12 @@ function UrlClaimer({ name, setName, onClaim }) {
 
         <div className="url-claimer-input-wrap">
           <div
-            className={`url-claimer-input-box ${
-              available === true
+            className={`url-claimer-input-box ${available === true
                 ? "available"
                 : available === false
-                ? "taken"
-                : ""
-            }`}
+                  ? "taken"
+                  : ""
+              }`}
           >
             <span className="url-claimer-prefix">
               devboard.app/
@@ -116,27 +114,26 @@ function UrlClaimer({ name, setName, onClaim }) {
           </div>
 
           <p
-            className={`url-claimer-status ${
-              !clean
+            className={`url-claimer-status ${!clean
                 ? "neutral"
                 : checking
-                ? "neutral"
-                : taken
-                ? "taken"
-                : available === true
-                ? "free"
-                : "neutral"
-            }`}
+                  ? "neutral"
+                  : taken
+                    ? "taken"
+                    : available === true
+                      ? "free"
+                      : "neutral"
+              }`}
           >
             {!clean
               ? "Type a username to check availability"
               : checking
-              ? "Checking availability..."
-              : taken
-              ? `devboard.app/${clean} is taken`
-              : available === true
-              ? `✓ devboard.app/${clean} is available — grab it free`
-              : "Unable to check username"}
+                ? "Checking availability..."
+                : taken
+                  ? `devboard.app/${clean} is taken`
+                  : available === true
+                    ? `✓ devboard.app/${clean} is available — grab it free`
+                    : "Unable to check username"}
           </p>
 
           <button
