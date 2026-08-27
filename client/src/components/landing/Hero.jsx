@@ -163,11 +163,7 @@ function Hero({ claimName, setClaimName, onClaim }) {
             <div className={`hero-claimer-input-box ${available ? "available" : taken ? "taken" : ""}`}>
               <span className="hero-claimer-prefix">devboard.app/</span>
 
-              {/* changes to be done here !!!!!!!!!!!!! */}
-              {/* changes to be done here !!!!!!!!!!!!! */}
-              {/* changes to be done here !!!!!!!!!!!!! */}
-              {/* changes to be done here !!!!!!!!!!!!! */}
-              {/* changes to be done here !!!!!!!!!!!!! */}
+             
               <input
                 value={claimName || ""}
                 onChange={(e) =>
