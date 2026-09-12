@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+  const VITE_BASE_URL= import.meta.VITE_BASE_URL
 function DarkCta({ name, setName, onClaim }) {
   const [available, setAvailable] = useState(null);
   const [checking, setChecking] = useState(false);
