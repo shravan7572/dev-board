@@ -8,7 +8,8 @@ function UrlClaimer({ name, setName, onClaim }) {
   const taken = available === false;
   const display = clean || "yourname";
 
-  const VITE_BASE_URL= import.meta.VITE_BASE_URL
+
+  const VITE_BASE_URL= import.meta.env.VITE_BASE_URL
 
   useEffect(() => {
     if (!clean) {

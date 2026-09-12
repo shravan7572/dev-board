@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import heroBg from "../../assets/devboard_hero_bg.jpg"
 
-  const VITE_BASE_URL= import.meta.VITE_BASE_URL
+  const VITE_BASE_URL= import.meta.env.VITE_BASE_URL
 // Floating glassmorphic card preview
 function FloatingCard() {
   const [tab, setTab] = useState("Projects")
