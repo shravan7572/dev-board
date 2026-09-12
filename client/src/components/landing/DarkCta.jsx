@@ -21,7 +21,7 @@ function DarkCta({ name, setName, onClaim }) {
         setAvailable(null);
 
         const response = await fetch(
-          `http://localhost:5001/api/auth/check-username/${encodeURIComponent(clean)}`
+          `${VITE_BASE_URL}/api/auth/check-username/${encodeURIComponent(clean)}`
         );
 
         if (!response.ok) {

@@ -112,7 +112,7 @@ function Hero({ claimName, setClaimName, onClaim }) {
         setChecking(true);
 
         const response = await fetch(
-          `http://localhost:5001/api/auth/check-username/${clean}`
+          `${VITE_BASE_URL}/api/auth/check-username/${clean}`
         );
 
         const data = await response.json();
